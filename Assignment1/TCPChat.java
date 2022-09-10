@@ -426,8 +426,12 @@ public class TCPChat implements Runnable {
             try {
                // Try to set up a server if host
                if (isHost) {
-                  hostServer = new ServerSocket(1230);
-                  socket = hostServer.accept();
+                  hostServer0 = new ServerSocket(1230);
+                  socket0 = hostServer.accept();
+                  hostServer1 = new ServerSocket(1231);
+                  socket1 = hostServer.accept();
+                  hostServer2 = new ServerSocket(1232);
+                  socket2 = hostServer.accept();
                }
 
                // If guest, try to connect to the server
