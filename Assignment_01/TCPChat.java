@@ -53,6 +53,10 @@ public class TCPChat implements Runnable {
     public static PrintWriter out = null;
     public static PrintWriter out0 = null;
 
+    public static FileWriter file = null;
+    public static BufferedWriter logFile = null;
+
+
     /////////////////////////////////////////////////////////////////
 
     private static JPanel initOptionsPane() {
@@ -149,6 +153,17 @@ public class TCPChat implements Runnable {
             public void actionPerformed(ActionEvent e) {
                 // Request a connection initiation
                 if (e.getActionCommand().equals("connect")) {
+                    // create log file for this client
+                    String logFileName = (isHost ? "host" : "guest");
+                    logFileName += port;
+                    logFileName += ".log";
+                    try {
+                        file = new FileWriter(logFileName);
+                        logFile = new BufferedWriter(file);
+                    } catch (Exception err) {
+                        err.getStackTrace();
+                    }
+
                     changeStatusNTS(BEGIN_CONNECT, true);
                 }
                 // Disconnect
@@ -312,12 +327,22 @@ public class TCPChat implements Runnable {
         return input1.toString();
     }
 
+    private static void logMessages(String type, String s) {
+        try {
+            logFile.write(type + ": " + s + "\n");
+        }
+        catch (Exception e) {
+            e.getStackTrace();
+        }
+    }
+
 
     // Add text to send-buffer
     private static void sendString(String s) {
         synchronized (toSend) {
             String reversed = reverse(s);
             String encrypted = rot13(reversed);
+            logMessages("OUTGOING", s);
             toSend.append(encrypted + "\n");
         }
     }
@@ -439,6 +464,7 @@ public class TCPChat implements Runnable {
 
                                     // Otherwise, receive what text
                                     else {
+                                        logMessages("INCOMING", s);
                                         appendToChatBox("INCOMING from 0: " + s + "\n" + "forwarding..." + "\n");
                                         toSend.append(s + "\n"); //Forwards
                                         changeStatusTS(NULL, true);
@@ -455,6 +481,7 @@ public class TCPChat implements Runnable {
 
                                     // Otherwise, receive what text
                                     else {
+                                        logMessages("INCOMING", s);
                                         appendToChatBox("INCOMING from: " + s + "\n" + "forwarding..." + "\n");
                                         toSend0.append(s + "\n"); //Forwards
                                         changeStatusTS(NULL, true);
@@ -486,6 +513,7 @@ public class TCPChat implements Runnable {
                                         else {
                                             String unencrypted = rot13(s);
                                             String unreversed = reverse(unencrypted);
+                                            logMessages("INCOMING", unreversed);
                                             appendToChatBox("INCOMING: " + unreversed + "\n");
                                             changeStatusTS(NULL, true);
                                         }
@@ -513,6 +541,7 @@ public class TCPChat implements Runnable {
                                         else {
                                             String unencrypted = rot13(s);
                                             String unreversed = reverse(unencrypted);
+                                            logMessages("INCOMING", unreversed);
                                             appendToChatBox("INCOMING: " + unreversed + "\n");
                                             changeStatusTS(NULL, true);
                                         }
@@ -530,6 +559,11 @@ public class TCPChat implements Runnable {
                     break;
 
                 case DISCONNECTING:
+                    // Closes the file writer
+                    try {
+                        logFile.close();
+                    } catch (IOException e) {}
+
                     // Tell other chatter to disconnect as well
                     out.print(END_CHAT_SESSION);
                     out.flush();
