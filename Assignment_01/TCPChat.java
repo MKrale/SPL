@@ -22,9 +22,11 @@ public class TCPChat implements Runnable {
     // Connection atate info
     public static String hostIP = "localhost";
     public static int port = 1234;
+    public static int code = 0000;
     public static int connectionStatus = DISCONNECTED;
     public static String statusString = statusMessages[connectionStatus];
     public static boolean isHost = true;
+    public static boolean isBlue = false;
     public static StringBuffer toAppend = new StringBuffer("");
     public static StringBuffer toSend = new StringBuffer("");
     public static StringBuffer toSend0 = new StringBuffer("");
@@ -38,8 +40,11 @@ public class TCPChat implements Runnable {
     public static JTextField statusColor = null;
     public static JTextField ipField = null;
     public static JTextField portField = null;
+    public static JTextField codeField = null;
     public static JRadioButton hostOption = null;
     public static JRadioButton guestOption = null;
+    public static JRadioButton blueOption = null;
+    public static JRadioButton redOption = null;
     public static JButton connectButton = null;
     public static JButton disconnectButton = null;
 
@@ -111,6 +116,32 @@ public class TCPChat implements Runnable {
         });
         pane.add(portField);
         optionsPane.add(pane);
+        
+     // Password input
+        pane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        pane.add(new JLabel("Entry code:"));
+        codeField = new JTextField(10);
+        codeField.setEditable(true);
+        codeField.setText((new Integer(code)).toString());
+        codeField.addFocusListener(new FocusAdapter() {
+            public void focusLost(FocusEvent e) {
+                // should be editable only when disconnected
+                if (connectionStatus != DISCONNECTED) {
+                    changeStatusNTS(NULL, true);
+                } else {
+                    int temp;
+                    try {
+                        temp = Integer.parseInt(codeField.getText());
+                        code = temp;
+                    } catch (NumberFormatException nfe) {
+                        portField.setText((new Integer(code)).toString());
+                        mainFrame.repaint();
+                    }
+                }
+            }
+        });
+        pane.add(codeField);
+        optionsPane.add(pane);
 
         // Host/guest option
         buttonListener = new ActionAdapter() {
@@ -147,6 +178,30 @@ public class TCPChat implements Runnable {
         pane.add(guestOption);
         optionsPane.add(pane);
 
+        
+     // Normal/Red option
+        buttonListener = new ActionAdapter() {
+            public void actionPerformed(ActionEvent e) {
+            	isBlue = e.getActionCommand().equals("blue");
+            }
+        };
+        ButtonGroup bgc = new ButtonGroup();
+        blueOption = new JRadioButton("Blue", false);
+        blueOption.setMnemonic(KeyEvent.VK_B);
+        blueOption.setActionCommand("blue");
+        blueOption.addActionListener(buttonListener);
+        redOption = new JRadioButton("Red", true);
+        redOption.setMnemonic(KeyEvent.VK_R);
+        redOption.setActionCommand("red");
+        redOption.addActionListener(buttonListener);
+        bgc.add(blueOption);
+        bgc.add(redOption);
+        pane = new JPanel(new GridLayout(1, 2));
+        pane.add(blueOption);
+        pane.add(redOption);
+        optionsPane.add(pane);
+        
+        
         // Connect/disconnect buttons
         JPanel buttonPane = new JPanel(new GridLayout(1, 2));
         buttonListener = new ActionAdapter() {
@@ -219,7 +274,7 @@ public class TCPChat implements Runnable {
             public void actionPerformed(ActionEvent e) {
                 String s = chatLine.getText();
                 if (!s.equals("")) {
-                    appendToChatBox("OUTGOING: " + s + "\n");
+                    appendToChatBox("OUTGOING: " + colour(s) + "\n");
                     chatLine.selectAll();
 
                     // Send the string
@@ -340,11 +395,20 @@ public class TCPChat implements Runnable {
     // Add text to send-buffer
     private static void sendString(String s) {
         synchronized (toSend) {
-            String reversed = reverse(s);
+        	String coloured = colour(s);
+            String reversed = reverse(coloured);
             String encrypted = rot13(reversed);
             logMessages("OUTGOING", s);
             toSend.append(encrypted + "\n");
         }
+    }
+    
+    // Placeholder function for colouring text:
+    private static String colour(String s) {
+    	if (!isBlue) {
+    		return s+"*RED*";
+    	}
+    	return s+"*BLUE*";
     }
 
     /////////////////////////////////////////////////////////////////
@@ -401,34 +465,45 @@ public class TCPChat implements Runnable {
             switch (connectionStatus) {
                 case BEGIN_CONNECT:
                     try {
-                        // Try to set up a server if host
-                        if (isHost) {
-                            //Setup a socket for each client
-                            hostServer = new ServerSocket(port);
-                            socket = hostServer.accept();
-                            hostServer0 = new ServerSocket(1230);
-                            socket0 = hostServer0.accept();
-                        }
-
-                        // If guest, try to connect to the server
-                        else {
-                            if (port == 1230) {
-                                socket0 = new Socket(hostIP, 1230);
-                            } else {
-                                socket = new Socket(hostIP, port);
-                            }
-
-                        }
-
-                        if (port == 1230 || isHost) {
-                            in0 = new BufferedReader(new InputStreamReader(socket0.getInputStream()));
-                            out0 = new PrintWriter(socket0.getOutputStream(), true);
-                        }
-                        if (port != 1230 || isHost) {
-                            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                            out = new PrintWriter(socket.getOutputStream(), true);
-                        }
-                        changeStatusTS(CONNECTED, true);
+                    	
+                    	// Check pass code
+                    	if (code != 0) {
+                    		// Do relevant stuff: now we just do'nt connect
+                    		cleanUp();
+                            changeStatusTS(DISCONNECTED, false);
+                    		
+                    	}
+                    	else {
+                    	
+	                        // Try to set up a server if host
+	                        if (isHost) {
+	                            //Setup a socket for each client
+	                            hostServer = new ServerSocket(port);
+	                            socket = hostServer.accept();
+	                            hostServer0 = new ServerSocket(1230);
+	                            socket0 = hostServer0.accept();
+	                        }
+	
+	                        // If guest, try to connect to the server
+	                        else {
+	                            if (port == 1230) {
+	                                socket0 = new Socket(hostIP, 1230);
+	                            } else {
+	                                socket = new Socket(hostIP, port);
+	                            }
+	
+	                        }
+	
+	                        if (port == 1230 || isHost) {
+	                            in0 = new BufferedReader(new InputStreamReader(socket0.getInputStream()));
+	                            out0 = new PrintWriter(socket0.getOutputStream(), true);
+	                        }
+	                        if (port != 1230 || isHost) {
+	                            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+	                            out = new PrintWriter(socket.getOutputStream(), true);
+	                        }
+	                        changeStatusTS(CONNECTED, true);
+                    	}
                     }
                     // If error, clean up and output an error message
                     catch (IOException e) {
