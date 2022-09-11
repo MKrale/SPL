@@ -31,6 +31,7 @@ public class TCPChat implements Runnable {
    public static String statusString = statusMessages[connectionStatus];
    public static StringBuffer toAppend = new StringBuffer("");
    public static StringBuffer toSend = new StringBuffer("");
+   public static StringBuffer toSend0 = new StringBuffer("");
 
    // Various GUI components and info
    public static JFrame mainFrame = null;
@@ -47,16 +48,14 @@ public class TCPChat implements Runnable {
    public static JButton disconnectButton = null;
 
    // TCP Components
-   public static ServerSocket hostServer0 = null;
-   public static ServerSocket hostServer1 = null;
-   public static ServerSocket hostServer2 = null;
    public static ServerSocket hostServer = null;
-   public static Socket socket0 = null;
-   public static Socket socket1 = null;
-   public static Socket socket2 = null;
+   public static ServerSocket hostServer0 = null;
    public static Socket socket = null;
+   public static Socket socket0 = null;
    public static BufferedReader in = null;
+   public static BufferedReader in0 = null;
    public static PrintWriter out = null;
+   public static PrintWriter out0 = null;
 
    /////////////////////////////////////////////////////////////////
 
@@ -426,18 +425,34 @@ public class TCPChat implements Runnable {
             try {
                // Try to set up a server if host
                if (isHost) {
-                  hostServer = new ServerSocket(1230);
+            	  //Setup a socket for each client
+                  hostServer = new ServerSocket(port);
                   socket = hostServer.accept();
+                  hostServer0 = new ServerSocket(1230);
+                  socket0 = hostServer0.accept();
                }
 
                // If guest, try to connect to the server
                else {
-                  socket = new Socket(hostIP, port);
+            	   if(port == 1230) {
+            		   socket0 = new Socket(hostIP, 1230);
+            	   }
+            	   else {
+            		   socket = new Socket(hostIP, port);
+            	   }
+                  
                }
 
-               in = new BufferedReader(new 
-                  InputStreamReader(socket.getInputStream()));
-               out = new PrintWriter(socket.getOutputStream(), true);
+               if(port == 1230 || isHost) {
+                   in0 = new BufferedReader(new 
+                           InputStreamReader(socket0.getInputStream()));
+                   out0 = new PrintWriter(socket0.getOutputStream(), true);
+               }
+               if(port != 1230 || isHost) {
+                   in = new BufferedReader(new 
+                           InputStreamReader(socket.getInputStream()));
+                   out = new PrintWriter(socket.getOutputStream(), true);
+               }
                changeStatusTS(CONNECTED, true);
             }
             // If error, clean up and output an error message
@@ -448,30 +463,107 @@ public class TCPChat implements Runnable {
             break;
 
          case CONNECTED:
-            try {
-               // Send data
-               if (toSend.length() != 0) {
-                  out.print(toSend); out.flush();
-                  toSend.setLength(0);
-                  changeStatusTS(NULL, true);
+            try {            	
+               if (isHost) {
+            	   //Send - should only be used to forward
+            	   if (toSend.length() != 0) {
+                       out.print(toSend); out.flush();
+                       toSend.setLength(0);
+                       changeStatusTS(NULL, true);
+                    }
+            	   if (toSend0.length() != 0) {
+                       out0.print(toSend0); out0.flush();
+                       toSend0.setLength(0);
+                       changeStatusTS(NULL, true);
+                    }
+            	   //Receive
+            	   if (in0.ready()) {
+                       s = in0.readLine();
+                       if ((s != null) &&  (s.length() != 0)) {
+                          // Check if it is the end of a trasmission
+                          if (s.equals(END_CHAT_SESSION)) {
+                             changeStatusTS(DISCONNECTING, true);
+                          }
+
+                          // Otherwise, receive what text
+                          else {
+                             appendToChatBox("INCOMING from 0: " + s + "\n" + "forwarding..." + "\n");
+                             toSend.append(s + "\n"); //Forwards
+                             changeStatusTS(NULL, true);
+                          }
+                       }
+                    }
+            	   if (in.ready()) {
+                       s = in.readLine();
+                       if ((s != null) &&  (s.length() != 0)) {
+                          // Check if it is the end of a trasmission
+                          if (s.equals(END_CHAT_SESSION)) {
+                             changeStatusTS(DISCONNECTING, true);
+                          }
+
+                          // Otherwise, receive what text
+                          else {
+                             appendToChatBox("INCOMING from: " + s + "\n" + "forwarding..." + "\n");
+                             toSend0.append(s + "\n"); //Forwards
+                             changeStatusTS(NULL, true);
+                          }
+                       }
+                    }
+            	   
+               }
+               else {
+                   if(port == 1230) {
+                       if (toSend.length() != 0) {
+                           out0.print(toSend); out0.flush();
+                           toSend.setLength(0);
+                           changeStatusTS(NULL, true);
+                        }
+
+                        // Receive data
+                        if (in0.ready()) {
+                           s = in0.readLine();
+                           if ((s != null) &&  (s.length() != 0)) {
+                              // Check if it is the end of a trasmission
+                              if (s.equals(END_CHAT_SESSION)) {
+                                 changeStatusTS(DISCONNECTING, true);
+                              }
+
+                              // Otherwise, receive what text
+                              else {
+                                 appendToChatBox("INCOMING: " + s + "\n");
+                                 changeStatusTS(NULL, true);
+                              }
+                           }
+                        }
+                   }
+                   if(port != 1230) {
+                       if (toSend.length() != 0) {
+                           out.print(toSend); out.flush();
+                           toSend.setLength(0);
+                           changeStatusTS(NULL, true);
+                        }
+
+                        // Receive data
+                        if (in.ready()) {
+                           s = in.readLine();
+                           if ((s != null) &&  (s.length() != 0)) {
+                              // Check if it is the end of a trasmission
+                              if (s.equals(END_CHAT_SESSION)) {
+                                 changeStatusTS(DISCONNECTING, true);
+                              }
+
+                              // Otherwise, receive what text
+                              else {
+                                 appendToChatBox("INCOMING: " + s + "\n");
+                                 changeStatusTS(NULL, true);
+                              }
+                           }
+                        }
+                   }
+            	   
                }
 
-               // Receive data
-               if (in.ready()) {
-                  s = in.readLine();
-                  if ((s != null) &&  (s.length() != 0)) {
-                     // Check if it is the end of a trasmission
-                     if (s.equals(END_CHAT_SESSION)) {
-                        changeStatusTS(DISCONNECTING, true);
-                     }
 
-                     // Otherwise, receive what text
-                     else {
-                        appendToChatBox("INCOMING: " + s + "\n");
-                        changeStatusTS(NULL, true);
-                     }
-                  }
-               }
             }
             catch (IOException e) {
                cleanUp();
