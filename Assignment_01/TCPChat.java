@@ -19,7 +19,7 @@ public class TCPChat implements Runnable {
     public final static TCPChat tcpObj = new TCPChat();
     public final static String END_CHAT_SESSION = new Character((char) 0).toString(); // Indicates the end of a session
 
-    // Connection atate info
+    // Connection state info
     public static String hostIP = "localhost";
     public static int port = 1234;
     public static int code = 0000;
@@ -60,6 +60,15 @@ public class TCPChat implements Runnable {
 
     public static FileWriter file = null;
     public static BufferedWriter logFile = null;
+
+    //Variability
+    class Conf {
+    	public static boolean Encryption = true;
+        public static boolean Logging = true;
+    }
+
+
+
 
 
     /////////////////////////////////////////////////////////////////
@@ -116,7 +125,7 @@ public class TCPChat implements Runnable {
         });
         pane.add(portField);
         optionsPane.add(pane);
-        
+
      // Password input
         pane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         pane.add(new JLabel("Entry code:"));
@@ -178,7 +187,7 @@ public class TCPChat implements Runnable {
         pane.add(guestOption);
         optionsPane.add(pane);
 
-        
+
      // Normal/Red option
         buttonListener = new ActionAdapter() {
             public void actionPerformed(ActionEvent e) {
@@ -200,8 +209,8 @@ public class TCPChat implements Runnable {
         pane.add(blueOption);
         pane.add(redOption);
         optionsPane.add(pane);
-        
-        
+
+
         // Connect/disconnect buttons
         JPanel buttonPane = new JPanel(new GridLayout(1, 2));
         buttonListener = new ActionAdapter() {
@@ -385,24 +394,35 @@ public class TCPChat implements Runnable {
     private static void logMessages(String type, String s) {
         try {
             logFile.write(type + ": " + s + "\n");
+            System.out.print("logged");
         }
         catch (Exception e) {
             e.getStackTrace();
         }
+
     }
 
 
     // Add text to send-buffer
     private static void sendString(String s) {
         synchronized (toSend) {
-        	String coloured = colour(s);
-            String reversed = reverse(coloured);
-            String encrypted = rot13(reversed);
-            logMessages("OUTGOING", s);
-            toSend.append(encrypted + "\n");
+        	// Colour
+        	s = colour(s);
+        	//Logging
+        	if (Conf.Logging) {
+                logMessages("OUTGOING", s);
+        	}
+        	//Encryption
+        	if (Conf.Encryption) {
+        		s = rot13(reverse(s));
+        	}
+        	// Sending
+        	toSend.append(s + "\n");
+
+
         }
     }
-    
+
     // Placeholder function for colouring text:
     private static String colour(String s) {
     	if (!isBlue) {
@@ -448,10 +468,50 @@ public class TCPChat implements Runnable {
         }
     }
 
+    static void sendMessage(StringBuffer toSend, PrintWriter out) {
+        if (toSend.length() != 0) {
+            out.print(toSend);
+            out.flush();
+            toSend.setLength(0);
+            changeStatusTS(NULL, true);
+        }
+      }
+    static String receiveMessage(BufferedReader in, boolean isHost) {
+		String s = null;
+    	try {
+            if (in.ready()) {
+                s = in.readLine();
+                if ((s != null) && (s.length() != 0)) {
+                    // Check if it is the end of a transmission TODO this probably doesnt work with encryption
+                    if (s.equals(END_CHAT_SESSION)) {
+                        changeStatusTS(DISCONNECTING, true);
+                    }
+
+                    // Otherwise, receive what text
+                    else {
+                    	if (Conf.Encryption && !isHost) {
+                    		s = reverse(rot13(s));
+                    	}
+                    	if (Conf.Logging) {
+                    		logMessages("INCOMING", s);
+                    	}
+                        appendToChatBox("INCOMING: " + s + "\n");
+                        changeStatusTS(NULL, true);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            cleanUp();
+            changeStatusTS(DISCONNECTED, false);
+        }
+        return s;
+    }
+
     /////////////////////////////////////////////////////////////////
 
     // The main procedure
     public static void main(String args[]) {
+
         String s;
 
         initGUI();
@@ -462,46 +522,43 @@ public class TCPChat implements Runnable {
             } catch (InterruptedException e) {
             }
 
+
             switch (connectionStatus) {
                 case BEGIN_CONNECT:
                     try {
-                    	
+
                     	// Check pass code
                     	if (code != 0) {
-                    		// Do relevant stuff: now we just do'nt connect
+                    		// Do relevant stuff: now we just don't connect
                     		cleanUp();
                             changeStatusTS(DISCONNECTED, false);
-                    		
                     	}
                     	else {
-                    	
+
 	                        // Try to set up a server if host
 	                        if (isHost) {
 	                            //Setup a socket for each client
 	                            hostServer = new ServerSocket(port);
 	                            socket = hostServer.accept();
-	                            hostServer0 = new ServerSocket(1230);
+	                            hostServer0 = new ServerSocket(1230); // TODO Make UI for this
 	                            socket0 = hostServer0.accept();
 	                        }
-	
+
 	                        // If guest, try to connect to the server
 	                        else {
-	                            if (port == 1230) {
-	                                socket0 = new Socket(hostIP, 1230);
-	                            } else {
-	                                socket = new Socket(hostIP, port);
-	                            }
-	
+	                            socket = new Socket(hostIP, port);
+
 	                        }
-	
-	                        if (port == 1230 || isHost) {
+
+                            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                            out = new PrintWriter(socket.getOutputStream(), true);
+
+                            //Host needs additional port
+	                        if (isHost) {
 	                            in0 = new BufferedReader(new InputStreamReader(socket0.getInputStream()));
 	                            out0 = new PrintWriter(socket0.getOutputStream(), true);
 	                        }
-	                        if (port != 1230 || isHost) {
-	                            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-	                            out = new PrintWriter(socket.getOutputStream(), true);
-	                        }
+
 	                        changeStatusTS(CONNECTED, true);
                     	}
                     }
@@ -513,124 +570,28 @@ public class TCPChat implements Runnable {
                     break;
 
                 case CONNECTED:
-                    try {
+                    	//Send what is in the queue
+                    	sendMessage(toSend, out);
+                    	// Receive what's in the queue
+                    	s = receiveMessage(in, isHost);
+
+                    	// Hosts handles forwarding and the other queue
                         if (isHost) {
-                            //Send - should only be used to forward
-                            if (toSend.length() != 0) {
-                                out.print(toSend);
-                                out.flush();
-                                toSend.setLength(0);
-                                changeStatusTS(NULL, true);
-                            }
-                            if (toSend0.length() != 0) {
-                                out0.print(toSend0);
-                                out0.flush();
-                                toSend0.setLength(0);
-                                changeStatusTS(NULL, true);
-                            }
-                            //Receive
-                            if (in0.ready()) {
-                                s = in0.readLine();
-                                if ((s != null) && (s.length() != 0)) {
-                                    // Check if it is the end of a trasmission
-                                    if (s.equals(END_CHAT_SESSION)) {
-                                        changeStatusTS(DISCONNECTING, true);
-                                    }
-
-                                    // Otherwise, receive what text
-                                    else {
-                                        logMessages("INCOMING", s);
-                                        appendToChatBox("INCOMING from 0: " + s + "\n" + "forwarding..." + "\n");
-                                        toSend.append(s + "\n"); //Forwards
-                                        changeStatusTS(NULL, true);
-                                    }
-                                }
-                            }
-                            if (in.ready()) {
-                                s = in.readLine();
-                                if ((s != null) && (s.length() != 0)) {
-                                    // Check if it is the end of a trasmission
-                                    if (s.equals(END_CHAT_SESSION)) {
-                                        changeStatusTS(DISCONNECTING, true);
-                                    }
-
-                                    // Otherwise, receive what text
-                                    else {
-                                        logMessages("INCOMING", s);
-                                        appendToChatBox("INCOMING from: " + s + "\n" + "forwarding..." + "\n");
-                                        toSend0.append(s + "\n"); //Forwards
-                                        changeStatusTS(NULL, true);
-                                    }
-                                }
-                            }
-
-                        }
-                        // If Guest
-                        else {
-                            if (port == 1230) {
-                                if (toSend.length() != 0) {
-                                    out0.print(toSend);
-                                    out0.flush();
-                                    toSend.setLength(0);
-                                    changeStatusTS(NULL, true);
-                                }
-
-                                // Receive data
-                                if (in0.ready()) {
-                                    s = in0.readLine();
-                                    if ((s != null) && (s.length() != 0)) {
-                                        // Check if it is the end of a trasmission
-                                        if (s.equals(END_CHAT_SESSION)) {
-                                            changeStatusTS(DISCONNECTING, true);
-                                        }
-
-                                        // Otherwise, receive what text
-                                        else {
-                                            String unencrypted = rot13(s);
-                                            String unreversed = reverse(unencrypted);
-                                            logMessages("INCOMING", unreversed);
-                                            appendToChatBox("INCOMING: " + unreversed + "\n");
-                                            changeStatusTS(NULL, true);
-                                        }
-                                    }
-                                }
-                            }
-                            if (port != 1230) {
-                                if (toSend.length() != 0) {
-                                    out.print(toSend);
-                                    out.flush();
-                                    toSend.setLength(0);
-                                    changeStatusTS(NULL, true);
-                                }
-
-                                // Receive data
-                                if (in.ready()) {
-                                    s = in.readLine();
-                                    if ((s != null) && (s.length() != 0)) {
-                                        // Check if it is the end of a trasmission
-                                        if (s.equals(END_CHAT_SESSION)) {
-                                            changeStatusTS(DISCONNECTING, true);
-                                        }
-
-                                        // Otherwise, receive what text
-                                        else {
-                                            String unencrypted = rot13(s);
-                                            String unreversed = reverse(unencrypted);
-                                            logMessages("INCOMING", unreversed);
-                                            appendToChatBox("INCOMING: " + unreversed + "\n");
-                                            changeStatusTS(NULL, true);
-                                        }
-                                    }
-                                }
-                            }
-
+                        	//Send the other queue
+                        	sendMessage(toSend0, out0);
+                            //Forward what's in the queue
+                        	if (s != null) {
+                        		appendToChatBox("forwarding..." + "\n");
+                                toSend0.append(s + "\n"); //Forwards
+                        	}
+                        	// And receive / forward what is in the remaining queue
+                        	s = receiveMessage(in0, isHost);
+                        	if (s != null) {
+                        		appendToChatBox("forwarding..." + "\n");
+                                toSend.append(s + "\n"); //Forwards
+                        	}
                         }
 
-
-                    } catch (IOException e) {
-                        cleanUp();
-                        changeStatusTS(DISCONNECTED, false);
-                    }
                     break;
 
                 case DISCONNECTING:
