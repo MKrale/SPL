@@ -33,6 +33,7 @@ public class TCPChat implements Runnable {
 
     // Various GUI components and info
     public static JFrame mainFrame = null;
+
     public static JTextArea chatText = null;
     public static JTextField chatLine = null;
     public static JPanel statusBar = null;
@@ -61,13 +62,71 @@ public class TCPChat implements Runnable {
     public static FileWriter file = null;
     public static BufferedWriter logFile = null;
 
+    public static JFrame confFrame = null;
+
+    public static JCheckBox loggingBox = null;
+    public static JCheckBox encryptionBox = null;
+
     //Variability
     class Conf {
     	public static boolean Encryption = true;
         public static boolean Logging = true;
     }
+    public void actionPerformed(ActionEvent e){
+        System.out.println(e);
 
 
+    }
+    // CONFIGURATION PANE
+    private static void initConfigGUI() {
+
+        JPanel pane = new JPanel(new FlowLayout());
+
+        loggingBox = new JCheckBox ("Enable logging", false);
+        loggingBox.setMnemonic(KeyEvent.VK_G);
+        pane.add(loggingBox);
+
+        encryptionBox = new JCheckBox ("Enable encryption", false);
+        encryptionBox.setMnemonic(KeyEvent.VK_G);
+        pane.add(encryptionBox);
+
+        ActionAdapter buttonListener = new ActionAdapter() {
+            public void actionPerformed(ActionEvent e) {
+                if(loggingBox.isSelected()){
+                    Conf.Logging = true;
+                } else {
+                    Conf.Logging = false;
+                }
+                if(encryptionBox.isSelected()){
+                    Conf.Encryption = true;
+                } else {
+                    Conf.Encryption = false;
+                }
+                // close pane
+                System.out.println(Conf.Logging + " " + Conf.Encryption);
+
+                confFrame.dispose();
+                initGUI();
+            }
+        };
+
+        JButton btn = new JButton("Confirm");
+        btn.setMnemonic(KeyEvent.VK_C);
+        btn.setActionCommand("confirm");
+        btn.addActionListener(buttonListener);
+        btn.setEnabled(true);
+        pane.add(btn);  // Add the button to the pane
+
+
+        // Now for the frame
+        confFrame = new JFrame();
+        confFrame.setContentPane(pane);  // Use our pane as the default pane
+        confFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Exit program when frame is closed
+        confFrame.setLocation(200, 200); // located at (200, 200)
+        confFrame.pack();                // Frame is ready. Pack it up for display.
+        confFrame.setVisible(true);      // Make it visible
+
+    }
 
 
 
@@ -254,6 +313,8 @@ public class TCPChat implements Runnable {
     }
 
     /////////////////////////////////////////////////////////////////
+
+
 
     // Initialize all the GUI components and display the frame
     private static void initGUI() {
@@ -513,8 +574,7 @@ public class TCPChat implements Runnable {
     public static void main(String args[]) {
 
         String s;
-
-        initGUI();
+        initConfigGUI();
 
         while (true) {
             try { // Poll every ~10 ms
