@@ -369,6 +369,7 @@ public class TCPChat implements Runnable {
     }
 
     /////////////////////////////////////////////////////////////////
+    // rot13 encryption
     public static String rot13(String input) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < input.length(); i++) {
@@ -382,6 +383,7 @@ public class TCPChat implements Runnable {
         return sb.toString();
     }
 
+    // reverse encryption
     public static String reverse(String input) {
         StringBuilder input1 = new StringBuilder();
         input1.append(input);
