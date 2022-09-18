@@ -73,6 +73,7 @@ public class TCPChat implements Runnable {
 
     /////////////////////////////////////////////////////////////////
 
+    // Initialize the Options Panel
     private static JPanel initOptionsPane() {
         JPanel pane = null;
         ActionAdapter buttonListener = null;
