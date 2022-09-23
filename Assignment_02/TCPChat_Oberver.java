@@ -122,7 +122,6 @@ public class TCPChat implements Runnable, Follower {
 
     // Various GUI components and info
     public static JFrame mainFrame = null;
-
     public static JTextArea chatText = null;
     public static JTextField chatLine = null;
     public static JPanel statusBar = null;
@@ -150,7 +149,7 @@ public class TCPChat implements Runnable, Follower {
 
     public static FileWriter file = null;
     public static BufferedWriter logFile = null;
-
+    
     public static boolean Encryption = true;
     public static boolean Logging = true;
     public static boolean Colour = true;
@@ -166,6 +165,7 @@ public class TCPChat implements Runnable, Follower {
     
     public Conf config = new Conf().add_follower(this).init_gui();
     
+    /////////////////////////////////////////////////////////////////
 
     private static JPanel initOptionsPane() {
         JPanel pane = null;
@@ -350,8 +350,6 @@ public class TCPChat implements Runnable, Follower {
     }
 
     /////////////////////////////////////////////////////////////////
-
-
 
     // Initialize all the GUI components and display the frame
     private static void initGUI() {
@@ -616,7 +614,8 @@ public class TCPChat implements Runnable, Follower {
     public static void main(String args[]) {
 
         String s;
-        initConfigGUI();
+
+        initGUI();
 
         while (true) {
             try { // Poll every ~10 ms
