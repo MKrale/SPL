@@ -1,101 +1,12 @@
 import java.lang.*;
 import java.util.*;
-import java.util.List;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.net.*;
 
-class Conf {
-	
-	// The options to be changed
-	public static boolean Encryption = true;
-    public static boolean Logging = true;
-    public static boolean Colour = true;
-    
-    // variables required for panel
-    public static JRadioButton OptionColourOn = null;
-    public static JRadioButton OptionColourOff = null;
-    
-    public static List<Follower> followers = new ArrayList();
-    
-    public Conf add_follower(Follower f) {
-		followers.add(f);
-		return this;
-	}
-    
-    public void update_followers() {
-    	for (Follower follower: followers) {
-    		follower.update();
-    	}
-    }
-    
-    public JPanel init_pane() {
-    	JPanel pane = null;
-        ActionAdapter buttonListener = null;
-
-        // Create an options pane
-        JPanel optionsPane = new JPanel(new GridLayout(4, 1));
-        
-     // Colour on/off
-        buttonListener = new ActionAdapter() {
-            public void actionPerformed(ActionEvent e) {
-            	Boolean Colour_new = e.getActionCommand().equals("on");
-            	if (Colour_new != Colour) {
-            		Colour = Colour_new;
-            		update_followers();
-            	}
-            }
-        };
-        ButtonGroup bgc = new ButtonGroup();
-        OptionColourOn = new JRadioButton("On", true);
-        OptionColourOn.setActionCommand("on");
-        OptionColourOn.addActionListener(buttonListener);
-        OptionColourOff = new JRadioButton("Off", false);
-        OptionColourOff.setActionCommand("off");
-        OptionColourOff.addActionListener(buttonListener);
-        bgc.add(OptionColourOn);
-        bgc.add(OptionColourOff);
-        pane = new JPanel(new GridLayout(1, 2));
-        pane.add(OptionColourOn);
-        pane.add(OptionColourOff);
-        optionsPane.add(pane);
-
-        return optionsPane;
-    }
-    
-    public Conf init_gui() {
-
-        // Set up the options pane
-        JPanel optionsPane = init_pane();
-        
-        // Set up the main pane
-        JPanel mainPane = new JPanel(new BorderLayout());
-        mainPane.add(optionsPane, BorderLayout.WEST);
-
-        // Set up the main frame
-        JFrame mainFrame = new JFrame("ChatOptions");
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setContentPane(mainPane);
-        mainFrame.setSize(mainFrame.getPreferredSize());
-        mainFrame.setLocation(300, 300);
-        mainFrame.pack();
-        mainFrame.setVisible(true);
-        return this;
-    }
-    
-    
-    
-}
-
-interface Follower {
-	void update();
-
-}
-
-
-public class TCPChat implements Runnable, Follower {
+public class TCPChat implements Runnable {
     // Connect status constants
     public final static int NULL = 0;
     public final static int DISCONNECTED = 1;
@@ -151,21 +62,96 @@ public class TCPChat implements Runnable, Follower {
     public static FileWriter file = null;
     public static BufferedWriter logFile = null;
 
-    public static boolean Encryption = true;
-    public static boolean Logging = true;
-    public static boolean Colour = true;
-    
-    public void update() {
-    	Encryption = Conf.Encryption;
-    	Logging = Conf.Logging;
-    	Colour = Conf.Colour;
-    	
-    	mainFrame.setVisible(false);
-    	initGUI();
+    public static JFrame confFrame = null;
+
+    public static JCheckBox loggingBox = null;
+    public static JCheckBox encryptionBox = null;
+    public static JCheckBox encryptionReverseBox = null;
+    public static JCheckBox colorsBox = null;
+    public static JCheckBox authenticationBox = null;
+
+    //Variability
+    class Conf {
+    	public static boolean Encryption = true;
+        public static boolean Colors = true;
+        public static boolean Authentication = true;
+        public static boolean Logging = true;
     }
-    
-    public Conf config = new Conf().add_follower(this).init_gui();
-    
+
+    // CONFIGURATION PANE
+    private static void initConfigGUI() {
+
+        JPanel pane = new JPanel(new FlowLayout());
+        boolean defaultChecked = true;
+
+        loggingBox = new JCheckBox ("Enable logging", defaultChecked);
+        loggingBox.setMnemonic(KeyEvent.VK_G);
+        pane.add(loggingBox);
+
+        encryptionBox = new JCheckBox ("Enable encryption", defaultChecked);
+        encryptionBox.setMnemonic(KeyEvent.VK_G);
+        pane.add(encryptionBox);
+
+        colorsBox = new JCheckBox ("Enable colors", defaultChecked);
+        colorsBox.setMnemonic(KeyEvent.VK_G);
+        pane.add(colorsBox);
+
+        authenticationBox = new JCheckBox ("Enable authentication", defaultChecked);
+        authenticationBox.setMnemonic(KeyEvent.VK_G);
+        pane.add(authenticationBox);
+
+        ActionAdapter buttonListener = new ActionAdapter() {
+            public void actionPerformed(ActionEvent e) {
+                if(loggingBox.isSelected()){
+                    Conf.Logging = true;
+                } else {
+                    Conf.Logging = false;
+                }
+                if(encryptionBox.isSelected()){
+                    Conf.Encryption = true;
+                } else {
+                    Conf.Encryption = false;
+                }
+
+
+                if(authenticationBox.isSelected()){
+                    Conf.Authentication = true;
+                } else {
+                    Conf.Authentication = false;
+                }
+
+                if(colorsBox.isSelected()){
+                    Conf.Colors = true;
+                } else {
+                    Conf.Colors = false;
+                }
+
+                confFrame.dispose();
+                initGUI();
+            }
+        };
+
+        JButton btn = new JButton("Confirm");
+        btn.setMnemonic(KeyEvent.VK_C);
+        btn.setActionCommand("confirm");
+        btn.addActionListener(buttonListener);
+        btn.setEnabled(true);
+        pane.add(btn);  // Add the button to the pane
+
+
+        // Now for the frame
+        confFrame = new JFrame();
+        confFrame.setContentPane(pane);  // Use our pane as the default pane
+        confFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Exit program when frame is closed
+        confFrame.setLocation(200, 200); // located at (200, 200)
+        confFrame.pack();                // Frame is ready. Pack it up for display.
+        confFrame.setVisible(true);      // Make it visible
+
+    }
+
+
+
+    /////////////////////////////////////////////////////////////////
 
     private static JPanel initOptionsPane() {
         JPanel pane = null;
@@ -281,30 +267,28 @@ public class TCPChat implements Runnable, Follower {
         pane.add(guestOption);
         optionsPane.add(pane);
 
-        if (Colour)
-        {
-	     // Normal/Red option
-	        buttonListener = new ActionAdapter() {
-	            public void actionPerformed(ActionEvent e) {
-	            	isBlue = e.getActionCommand().equals("blue");
-	            }
-	        };
-	        ButtonGroup bgc = new ButtonGroup();
-	        blueOption = new JRadioButton("Blue", false);
-	        blueOption.setMnemonic(KeyEvent.VK_B);
-	        blueOption.setActionCommand("blue");
-	        blueOption.addActionListener(buttonListener);
-	        redOption = new JRadioButton("Red", true);
-	        redOption.setMnemonic(KeyEvent.VK_R);
-	        redOption.setActionCommand("red");
-	        redOption.addActionListener(buttonListener);
-	        bgc.add(blueOption);
-	        bgc.add(redOption);
-	        pane = new JPanel(new GridLayout(1, 2));
-	        pane.add(blueOption);
-	        pane.add(redOption);
-	        optionsPane.add(pane);
-        }
+
+     // Normal/Red option
+        buttonListener = new ActionAdapter() {
+            public void actionPerformed(ActionEvent e) {
+            	isBlue = e.getActionCommand().equals("blue");
+            }
+        };
+        ButtonGroup bgc = new ButtonGroup();
+        blueOption = new JRadioButton("Blue", false);
+        blueOption.setMnemonic(KeyEvent.VK_B);
+        blueOption.setActionCommand("blue");
+        blueOption.addActionListener(buttonListener);
+        redOption = new JRadioButton("Red", true);
+        redOption.setMnemonic(KeyEvent.VK_R);
+        redOption.setActionCommand("red");
+        redOption.addActionListener(buttonListener);
+        bgc.add(blueOption);
+        bgc.add(redOption);
+        pane = new JPanel(new GridLayout(1, 2));
+        pane.add(blueOption);
+        pane.add(redOption);
+        optionsPane.add(pane);
 
 
         // Connect/disconnect buttons
@@ -467,7 +451,6 @@ public class TCPChat implements Runnable, Follower {
     }
 
     /////////////////////////////////////////////////////////////////
-    // rot13 encryption
     public static String rot13(String input) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < input.length(); i++) {
@@ -481,7 +464,6 @@ public class TCPChat implements Runnable, Follower {
         return sb.toString();
     }
 
-    // reverse encryption
     public static String reverse(String input) {
         StringBuilder input1 = new StringBuilder();
         input1.append(input);
@@ -494,7 +476,6 @@ public class TCPChat implements Runnable, Follower {
     private static void logMessages(String type, String s) {
         try {
             logFile.write(type + ": " + s + "\n");
-            System.out.print("logged");
         }
         catch (Exception e) {
             e.getStackTrace();
@@ -502,6 +483,9 @@ public class TCPChat implements Runnable, Follower {
 
     }
 
+    private static void printOutMessage(String type, String s) {
+        System.out.print(type + ": " + s + "\n");
+    }
 
     // Add text to send-buffer
     private static void sendString(String s) {
@@ -511,6 +495,7 @@ public class TCPChat implements Runnable, Follower {
         	//Logging
         	if (Conf.Logging) {
                 logMessages("OUTGOING", s);
+                printOutMessage("OUTGOING", s);
         	}
         	//Encryption
         	if (Conf.Encryption) {
@@ -525,9 +510,6 @@ public class TCPChat implements Runnable, Follower {
 
     // Placeholder function for colouring text:
     private static String colour(String s) {
-    	if (! Colour) {
-    		return s;
-    	}
     	if (!isBlue) {
     		return s+"*RED*";
     	}
@@ -597,6 +579,8 @@ public class TCPChat implements Runnable, Follower {
                     	}
                     	if (Conf.Logging) {
                     		logMessages("INCOMING", s);
+                            printOutMessage("INCOMING", s);
+
                     	}
                         appendToChatBox("INCOMING: " + s + "\n");
                         changeStatusTS(NULL, true);
