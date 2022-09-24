@@ -87,6 +87,7 @@ public class TCPChat implements Runnable {
     	/*else[Logging]*/
     	public static boolean Logging = false;
     	/*end[Logging]*/
+
     }
 
 
