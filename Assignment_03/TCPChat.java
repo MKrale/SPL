@@ -62,14 +62,6 @@ public class TCPChat implements Runnable {
     public static FileWriter file = null;
     public static BufferedWriter logFile = null;
 
-    public static JFrame confFrame = null;
-
-    public static JCheckBox loggingBox = null;
-    public static JCheckBox encryptionBox = null;
-    public static JCheckBox encryptionReverseBox = null;
-    public static JCheckBox colorsBox = null;
-    public static JCheckBox authenticationBox = null;
-
     //Variability
     class Conf {
     	/*if[Encryption]*/
@@ -97,76 +89,7 @@ public class TCPChat implements Runnable {
     	/*end[Logging]*/
     }
 
-    // CONFIGURATION PANE
-    private static void initConfigGUI() {
 
-        JPanel pane = new JPanel(new FlowLayout());
-        boolean defaultChecked = true;
-
-        loggingBox = new JCheckBox ("Enable logging", defaultChecked);
-        loggingBox.setMnemonic(KeyEvent.VK_G);
-        pane.add(loggingBox);
-
-        encryptionBox = new JCheckBox ("Enable encryption", defaultChecked);
-        encryptionBox.setMnemonic(KeyEvent.VK_G);
-        pane.add(encryptionBox);
-
-        colorsBox = new JCheckBox ("Enable colors", defaultChecked);
-        colorsBox.setMnemonic(KeyEvent.VK_G);
-        pane.add(colorsBox);
-
-        authenticationBox = new JCheckBox ("Enable authentication", defaultChecked);
-        authenticationBox.setMnemonic(KeyEvent.VK_G);
-        pane.add(authenticationBox);
-
-        ActionAdapter buttonListener = new ActionAdapter() {
-            public void actionPerformed(ActionEvent e) {
-                if(loggingBox.isSelected()){
-                    Conf.Logging = true;
-                } else {
-                    Conf.Logging = false;
-                }
-                if(encryptionBox.isSelected()){
-                    Conf.Encryption = true;
-                } else {
-                    Conf.Encryption = false;
-                }
-
-
-                if(authenticationBox.isSelected()){
-                    Conf.Authentication = true;
-                } else {
-                    Conf.Authentication = false;
-                }
-
-                if(colorsBox.isSelected()){
-                    Conf.Colors = true;
-                } else {
-                    Conf.Colors = false;
-                }
-
-                confFrame.dispose();
-                initGUI();
-            }
-        };
-
-        JButton btn = new JButton("Confirm");
-        btn.setMnemonic(KeyEvent.VK_C);
-        btn.setActionCommand("confirm");
-        btn.addActionListener(buttonListener);
-        btn.setEnabled(true);
-        pane.add(btn);  // Add the button to the pane
-
-
-        // Now for the frame
-        confFrame = new JFrame();
-        confFrame.setContentPane(pane);  // Use our pane as the default pane
-        confFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Exit program when frame is closed
-        confFrame.setLocation(200, 200); // located at (200, 200)
-        confFrame.pack();                // Frame is ready. Pack it up for display.
-        confFrame.setVisible(true);      // Make it visible
-
-    }
 
 
 
@@ -619,7 +542,7 @@ public class TCPChat implements Runnable {
     public static void main(String args[]) {
 
         String s;
-        initConfigGUI();
+        initGUI();
 
         while (true) {
             try { // Poll every ~10 ms
