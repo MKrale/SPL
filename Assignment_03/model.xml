@@ -13,6 +13,7 @@
 		<and abstract="true" mandatory="true" name="Chat">
 			<feature mandatory="true" name="Base"/>
 			<or abstract="true" name="Encryption">
+				<graphics key="collapsed" value="false"/>
 				<feature name="Rot13"/>
 				<feature name="Reverse"/>
 			</or>
