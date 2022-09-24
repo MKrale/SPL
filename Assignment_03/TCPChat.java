@@ -72,10 +72,26 @@ public class TCPChat implements Runnable {
 
     //Variability
     class Conf {
+    	//#if Encryption
     	public static boolean Encryption = true;
-        public static boolean Colors = true;
-        public static boolean Authentication = true;
-        public static boolean Logging = true;
+    	//#else
+    	public static boolean Encryption = false;
+    	//#endif
+    	//#if Colors
+    	public static boolean Colors = true;
+    	//#else
+    	public static boolean Colors = false;
+    	//#endif
+    	//#if Authentication
+    	public static boolean Authentication = true;
+    	//#else
+    	public static boolean Authentication = false;
+    	//#endif
+    	//#if Logging
+    	public static boolean Logging = true;
+    	//#else
+    	public static boolean Logging = false;
+    	//#endif
     }
 
     // CONFIGURATION PANE
