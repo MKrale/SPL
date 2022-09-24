@@ -72,27 +72,27 @@ public class TCPChat implements Runnable {
 
     //Variability
     class Conf {
-    	/*if[Encryption]
+    	/*if[Encryption]*/
     	public static boolean Encryption = true;
-    	else[Encryption]*/
+    	/*else[Encryption]*/
     	public static boolean Encryption = false;
     	/*end[Encryption]*/    	
     	
-    	/*if[Colors]
+    	/*if[Colors]*/
     	public static boolean Colors = true;
-    	else[Colors]*/
+    	/*else[Colors]*/
     	public static boolean Colors = false;
     	/*end[Colors]*/    	
     	
-    	/*if[Authentication] 
+    	/*if[Authentication]*/
     	public static boolean Authentication = true;
-    	else[Authentication]*/
+    	/*else[Authentication]*/
     	public static boolean Authentication = false;
     	/*end[Authentication]*/
     	
-    	/*if[Logging] 
+    	/*if[Logging]*/
     	public static boolean Logging = true;
-    	else[Logging]*/
+    	/*else[Logging]*/
     	public static boolean Logging = false;
     	/*end[Logging]*/
     }

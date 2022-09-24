@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration>
-	<feature name="Chat"/>
-	<feature name="Base"/>
+	<feature automatic="selected" name="Chat"/>
+	<feature automatic="selected" name="Base"/>
 	<feature name="Encryption"/>
 	<feature name="Rot13"/>
 	<feature name="Reverse"/>
