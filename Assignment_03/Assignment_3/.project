@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Assignment_03</name>
+	<name>TCPChat</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -10,7 +10,7 @@
 			<arguments>
 				<dictionary>
 					<key>build</key>
-					<value>src</value>
+					<value>source</value>
 				</dictionary>
 				<dictionary>
 					<key>composer</key>
