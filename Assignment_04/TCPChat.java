@@ -40,7 +40,6 @@ public class TCPChat implements Runnable {
     public static JPanel statusBar = null;
     public static JLabel statusField = null;
     public static JTextField statusColor = null;
-    public static JTextField ipField = null;
     public static JTextField portField = null;
     public static JTextField codeField = null;
     public static JRadioButton hostOption = null;
@@ -61,14 +60,14 @@ public class TCPChat implements Runnable {
 	
 	    public static JFrame confFrame = null;
 
-    public static Plugin plugin = new Plugin_encryption();
-    		
+   public static Plugin plugin = new Plugin_authentication();
+
     		
 	public void set_plugin(Plugin p) {
 		this.plugin = p;
 		this.plugin.get_chat(this);
 	}
-		
+
 
     // CONFIGURATION PANE -> Unused
 //    private static void initConfigGUI() {
@@ -152,25 +151,7 @@ public class TCPChat implements Runnable {
         // Create an options pane
         JPanel optionsPane = new JPanel(new GridLayout(4, 1));
 
-        // IP address input
-        pane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        pane.add(new JLabel("Host IP:"));
-        ipField = new JTextField(10);
-        ipField.setText(hostIP);
-        ipField.setEnabled(false);
-        ipField.addFocusListener(new FocusAdapter() {
-            public void focusLost(FocusEvent e) {
-                ipField.selectAll();
-                // Should be editable only when disconnected
-                if (connectionStatus != DISCONNECTED) {
-                    changeStatusNTS(NULL, true);
-                } else {
-                    hostIP = ipField.getText();
-                }
-            }
-        });
-        pane.add(ipField);
-        optionsPane.add(pane);
+
 
         // Port input
         pane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -209,13 +190,8 @@ public class TCPChat implements Runnable {
                     isHost = e.getActionCommand().equals("host");
 
                     // Cannot supply host IP if host option is chosen
-                    if (isHost) {
-                        ipField.setEnabled(false);
-                        ipField.setText("localhost");
-                        hostIP = "localhost";
-                    } else {
-                        ipField.setEnabled(true);
-                    }
+
+                    hostIP = "localhost";
                 }
             }
         };
@@ -698,7 +674,6 @@ public class TCPChat implements Runnable {
             case DISCONNECTED:
                 connectButton.setEnabled(true);
                 disconnectButton.setEnabled(false);
-                ipField.setEnabled(true);
                 portField.setEnabled(true);
                 hostOption.setEnabled(true);
                 guestOption.setEnabled(true);
@@ -710,7 +685,6 @@ public class TCPChat implements Runnable {
             case DISCONNECTING:
                 connectButton.setEnabled(false);
                 disconnectButton.setEnabled(false);
-                ipField.setEnabled(false);
                 portField.setEnabled(false);
                 hostOption.setEnabled(false);
                 guestOption.setEnabled(false);
@@ -721,7 +695,6 @@ public class TCPChat implements Runnable {
             case CONNECTED:
                 connectButton.setEnabled(false);
                 disconnectButton.setEnabled(true);
-                ipField.setEnabled(false);
                 portField.setEnabled(false);
                 hostOption.setEnabled(false);
                 guestOption.setEnabled(false);
@@ -732,7 +705,6 @@ public class TCPChat implements Runnable {
             case BEGIN_CONNECT:
                 connectButton.setEnabled(false);
                 disconnectButton.setEnabled(false);
-                ipField.setEnabled(false);
                 portField.setEnabled(false);
                 hostOption.setEnabled(false);
                 guestOption.setEnabled(false);
@@ -744,7 +716,6 @@ public class TCPChat implements Runnable {
 
         // Make sure that the button/text field states are consistent
         // with the internal states
-        ipField.setText(hostIP);
         portField.setText((new Integer(port)).toString());
         hostOption.setSelected(isHost);
         guestOption.setSelected(!isHost);
