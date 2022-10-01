@@ -16,7 +16,7 @@ public class Plugin {
 	public String message_out(String s) {return s;}
 	
 	// For extending the chat UI 
-	public JPanel extend_ChatUI(JPanel panel) {return panel;};
+	//public JPanel extend_ChatUI(JPanel panel) {return panel;};
 	// If we both the option to change in runtime and compile-time, we could also add this:
 	//public JPanel extend_OptionsUI(JPanel panel);
 

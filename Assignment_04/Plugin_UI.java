@@ -14,11 +14,6 @@ class Plugin_UI extends Plugin {
 	private final int DISCONNECTING = 2;
 	private final int BEGIN_CONNECT = 3;
 	private final int CONNECTED = 4;
-	private String hostIP = "localhost";
-
-
-
-
 
     public JPanel extend_ChatUI(JPanel panel) {
 		JPanel pane = null;
@@ -63,7 +58,7 @@ class Plugin_UI extends Plugin {
 	            } else {
 	                chat.isHost = e.getActionCommand().equals("host");
 
-					hostIP = "localhost";
+					chat.hostIP = "localhost";
 
 	            }
 	        }
