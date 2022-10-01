@@ -61,7 +61,7 @@ public class TCPChat implements Runnable {
 	
 	    public static JFrame confFrame = null;
 
-    public static Plugin plugin = new Plugin_authentication();
+    public static Plugin plugin = new Plugin_encryption();
     		
     		
 	public void set_plugin(Plugin p) {
@@ -477,7 +477,7 @@ public class TCPChat implements Runnable {
         	/*=============================================================================================
              * 										Plugin hotspot Out-messages
              =============================================================================================*/
-        	s = plugin.message_out(s);
+        	// Wrong?? s = plugin.message_out(s);
         	// Sending
         	toSend.append(s + "\n");
 
@@ -559,6 +559,7 @@ public class TCPChat implements Runnable {
 //                            printOutMessage("INCOMING", s);
 //
 //                    	}
+                    	s = plugin.message_in(s);
                         appendToChatBox("INCOMING: " + s + "\n");
                         changeStatusTS(NULL, true);
                     }
