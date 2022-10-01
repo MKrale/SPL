@@ -32,14 +32,14 @@ public class Plugin_encryption extends Plugin {
 	}
 	
 	public String message_in(String s) {
-		if (!chat.isHost) {
+		if (!isHost) {
 			s = reverse(rot13(s));
 		}
 		return s;
 	}
 	
 	public String message_out(String s){
-		if (!chat.isHost) {
+		if (!isHost) {
 			s = rot13(reverse(s));
 		}
 		return s;
