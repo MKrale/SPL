@@ -22,16 +22,20 @@ public class Plugin {
 
 	// Everything Chat and UI related
 	public void initGUI() {};
-	public int port = 1234;
-	public int connectionStatus = 1;
-	public final String statusMessages[] = {" Error! Could not connect!", " Disconnected", " Disconnecting...", " Connecting...", " Connected"};
-	public final Plugin_UI tcpObj = new Plugin_UI();
-	public String statusString = statusMessages[connectionStatus];
 	public JFrame mainFrame = null;
-	public boolean isHost = true;
 
-	public StringBuffer toSend = new StringBuffer("");
+	public JTextField portField = null;
 
+	public JTextArea chatText = null;
+	public JTextField chatLine = null;
+	public JPanel statusBar = null;
+	public JLabel statusField = null;
+	public JTextField statusColor = null;
+	public JTextField codeField = null;
+	public JRadioButton hostOption = null;
+	public JRadioButton guestOption = null;
+	public JButton connectButton = null;
+	public JButton disconnectButton = null;
 
 	// Adds options to cancel start-up
 	public boolean can_start() {return true;};

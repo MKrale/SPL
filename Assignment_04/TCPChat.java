@@ -7,7 +7,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.net.*;
 
-public class TCPChat {
+public class TCPChat implements Runnable {
     
 
     public final static int NULL = 0;
@@ -18,13 +18,21 @@ public class TCPChat {
 
     // Other constants
     public final static String statusMessages[] = {" Error! Could not connect!", " Disconnected", " Disconnecting...", " Connecting...", " Connected"};
+    public final static TCPChat tcpObj = new TCPChat();
     public final static String END_CHAT_SESSION = new Character((char) 0).toString(); // Indicates the end of a session
+
 
     // Connection state info
     public static String hostIP = "localhost";
-
+    public static int port = 1234;
     public static int code = 0000;
+    public static int connectionStatus = DISCONNECTED;
+    public static String statusString = statusMessages[connectionStatus];
+    public static boolean isHost = true;
+    public static StringBuffer toAppend = new StringBuffer("");
+    public static StringBuffer toSend = new StringBuffer("");
     public static StringBuffer toSend0 = new StringBuffer("");
+
 
 
     // TCP Components
@@ -43,9 +51,9 @@ public class TCPChat {
    public static Plugin plugin = new Plugin_UI();
 
     		
-	public static void set_plugin(Plugin p) {
-		plugin = p;
-		plugin.get_chat(this);
+	public void set_plugin(Plugin p) {
+		this.plugin = p;
+		this.plugin.get_chat(this);
 	}
 
 
@@ -137,7 +145,7 @@ public class TCPChat {
 //                if (plugin.connectionStatus != DISCONNECTED) {
 //                    changeStatusNTS(NULL, true);
 //                } else {
-//                    plugin.isHost = e.getActionCommand().equals("host");
+//                    isHost = e.getActionCommand().equals("host");
 //
 //                    // Cannot supply host IP if host option is chosen
 //
@@ -192,8 +200,8 @@ public class TCPChat {
 //                // Request a connection initiation
 //                if (e.getActionCommand().equals("connect")) {
 //                    // create log file for this client
-//                    String logFileName = (plugin.isHost ? "host" : "guest");
-//                    logFileName += plugin.port;
+//                    String logFileName = (isHost ? "host" : "guest");
+//                    logFileName += port;
 //                    logFileName += ".log";
 ////                    try {
 ////                        file = new FileWriter(logFileName);
@@ -244,26 +252,123 @@ public class TCPChat {
     private static void changeStatusTS(int newConnectStatus, boolean noError) {
         // Change state if valid state
         if (newConnectStatus != NULL) {
-            plugin.connectionStatus = newConnectStatus;
+            connectionStatus = newConnectStatus;
         }
 
         // If there is no error, display the appropriate status message
         if (noError) {
-            plugin.statusString = statusMessages[plugin.connectionStatus];
+            statusString = statusMessages[connectionStatus];
         }
         // Otherwise, display error message
         else {
-            plugin.statusString = statusMessages[NULL];
+            statusString = statusMessages[NULL];
         }
 
         // Call the run() routine (Runnable interface) on the
         // error-handling and GUI-update thread
-        SwingUtilities.invokeLater(plugin.tcpObj);
+        SwingUtilities.invokeLater(tcpObj);
     }
 
 
+    /////////////////////////////////////////////////////////////////
+
+    // The non-thread-safe way to change the GUI components while
+    // changing state
+    static void changeStatusNTS(int newConnectStatus, boolean noError) {
+        // Change state if valid state
+        if (newConnectStatus != NULL) {
+            connectionStatus = newConnectStatus;
+        }
+
+        // If there is no error, display the appropriate status message
+        if (noError) {
+            statusString = statusMessages[connectionStatus];
+        }
+        // Otherwise, display error message
+        else {
+            statusString = statusMessages[NULL];
+        }
+
+        // Call the run() routine (Runnable interface) on the
+        // current thread
+        tcpObj.run();
+    }
+
+    /////////////////////////////////////////////////////////////////
+
+    // Thread-safe way to append to the chat box
+    private static void appendToChatBox(String s) {
+        synchronized (toAppend) {
+            toAppend.append(s);
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////
+    public static String rot13(String input) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c >= 'a' && c <= 'm') c += 13;
+            else if (c >= 'A' && c <= 'M') c += 13;
+            else if (c >= 'n' && c <= 'z') c -= 13;
+            else if (c >= 'N' && c <= 'Z') c -= 13;
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
+    public static String reverse(String input) {
+        StringBuilder input1 = new StringBuilder();
+        input1.append(input);
+
+        // reverse StringBuilder input1
+        input1.reverse();
+        return input1.toString();
+    }
+
+//    private static void logMessages(String type, String s) {
+//        try {
+//            logFile.write(type + ": " + s + "\n");
+//        }
+//        catch (Exception e) {
+//            e.getStackTrace();
+//        }
+//
+//    }
 
 
+    // Add text to send-buffer
+    static void sendString(String s) {
+        synchronized (toSend) {
+//        	// Colour
+//        	s = colour(s);
+//        	//Logging
+//        	if (Conf.Logging) {
+//                logMessages("OUTGOING", s);
+//                printOutMessage("OUTGOING", s);
+//        	}
+//        	//Encryption
+//        	if (Conf.Encryption) {
+//        		s = rot13(reverse(s));
+//        	}
+        	/*=============================================================================================
+             * 										Plugin hotspot Out-messages
+             =============================================================================================*/
+        	// Wrong?? s = plugin.message_out(s);
+        	// Sending
+        	toSend.append(s + "\n");
+
+
+        }
+    }
+
+//    // Placeholder function for colouring text:
+//    private static String colour(String s) {
+//    	if (!isBlue) {
+//    		return s+"*RED*";
+//    	}
+//    	return s+"*BLUE*";
+//    }
 
     /////////////////////////////////////////////////////////////////
 
@@ -332,6 +437,7 @@ public class TCPChat {
 //
 //                    	}
                     	s = plugin.message_in(s);
+                        appendToChatBox("INCOMING: " + s + "\n");
                         changeStatusTS(NULL, true);
                     }
                 }
@@ -347,10 +453,8 @@ public class TCPChat {
 
     // The main procedure
     public static void main(String args[]) {
-        set_plugin(plugin);
 
         String s;
-        System.out.print("asdasd");
         plugin.initGUI();
 
         while (true) {
@@ -360,7 +464,7 @@ public class TCPChat {
             }
 
 
-            switch (plugin.connectionStatus) {
+            switch (connectionStatus) {
                 case BEGIN_CONNECT:
                     try {
 
@@ -377,9 +481,9 @@ public class TCPChat {
                     	if(can_start) {
 
 	                        // Try to set up a server if host
-	                        if (plugin.isHost) {
+	                        if (isHost) {
 	                            //Setup a socket for each client
-	                            hostServer = new ServerSocket(plugin.port);
+	                            hostServer = new ServerSocket(port);
 	                            socket = hostServer.accept();
 	                            hostServer0 = new ServerSocket(1230); // TODO Make UI for this
 	                            socket0 = hostServer0.accept();
@@ -387,7 +491,7 @@ public class TCPChat {
 
 	                        // If guest, try to connect to the server
 	                        else {
-	                            socket = new Socket(hostIP, plugin.port);
+	                            socket = new Socket(hostIP, port);
 
 	                        }
 
@@ -395,7 +499,7 @@ public class TCPChat {
                             out = new PrintWriter(socket.getOutputStream(), true);
 
                             //Host needs additional port
-	                        if (plugin.isHost) {
+	                        if (isHost) {
 	                            in0 = new BufferedReader(new InputStreamReader(socket0.getInputStream()));
 	                            out0 = new PrintWriter(socket0.getOutputStream(), true);
 	                        }
@@ -418,22 +522,24 @@ public class TCPChat {
 
                 case CONNECTED:
                     	//Send what is in the queue
-                    	sendMessage(plugin.toSend, out);
+                    	sendMessage(toSend, out);
                     	// Receive what's in the queue
-                    	s = receiveMessage(in, plugin.isHost);
+                    	s = receiveMessage(in, isHost);
 
                     	// Hosts handles forwarding and the other queue
-                        if (plugin.isHost) {
+                        if (isHost) {
                         	//Send the other queue
                         	sendMessage(toSend0, out0);
                             //Forward what's in the queue
                         	if (s != null) {
+                        		appendToChatBox("forwarding..." + "\n");
                                 toSend0.append(s + "\n"); //Forwards
                         	}
                         	// And receive / forward what is in the remaining queue
-                        	s = receiveMessage(in0, plugin.isHost);
+                        	s = receiveMessage(in0, isHost);
                         	if (s != null) {
-                                plugin.toSend.append(s + "\n"); //Forwards
+                        		appendToChatBox("forwarding..." + "\n");
+                                toSend.append(s + "\n"); //Forwards
                         	}
                         }
 
@@ -458,6 +564,67 @@ public class TCPChat {
                     break; // do nothing
             }
         }
+    }
+
+    /////////////////////////////////////////////////////////////////
+
+    // Checks the current state and sets the enables/disables
+    // accordingly
+    public void run() {
+        switch (connectionStatus) {
+            case DISCONNECTED:
+                plugin.connectButton.setEnabled(true);
+                plugin.disconnectButton.setEnabled(false);
+                plugin.portField.setEnabled(true);
+                plugin.hostOption.setEnabled(true);
+                plugin.guestOption.setEnabled(true);
+                plugin.chatLine.setText("");
+                plugin.chatLine.setEnabled(false);
+                plugin.statusColor.setBackground(Color.red);
+                break;
+
+            case DISCONNECTING:
+                plugin.connectButton.setEnabled(false);
+                plugin.disconnectButton.setEnabled(false);
+                plugin.portField.setEnabled(false);
+                plugin.hostOption.setEnabled(false);
+                plugin.guestOption.setEnabled(false);
+                plugin.chatLine.setEnabled(false);
+                plugin.statusColor.setBackground(Color.orange);
+                break;
+
+            case CONNECTED:
+                plugin.connectButton.setEnabled(false);
+                plugin.disconnectButton.setEnabled(true);
+                plugin.portField.setEnabled(false);
+                plugin.hostOption.setEnabled(false);
+                plugin.guestOption.setEnabled(false);
+                plugin.chatLine.setEnabled(true);
+                plugin.statusColor.setBackground(Color.green);
+                break;
+
+            case BEGIN_CONNECT:
+                plugin.connectButton.setEnabled(false);
+                plugin.disconnectButton.setEnabled(false);
+                plugin.portField.setEnabled(false);
+                plugin.hostOption.setEnabled(false);
+                plugin.guestOption.setEnabled(false);
+                plugin.chatLine.setEnabled(false);
+                plugin.chatLine.grabFocus();
+                plugin.statusColor.setBackground(Color.orange);
+                break;
+        }
+
+        // Make sure that the button/text field states are consistent
+        // with the internal states
+        plugin.portField.setText((new Integer(port)).toString());
+        plugin.hostOption.setSelected(isHost);
+        plugin.guestOption.setSelected(!isHost);
+        plugin.statusField.setText(statusString);
+        plugin.chatText.append(toAppend.toString());
+        toAppend.setLength(0);
+
+        plugin.mainFrame.repaint();
     }
 }
 

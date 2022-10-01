@@ -8,48 +8,16 @@ import javax.swing.*;
 import java.net.*;
 
 
-class Plugin_UI extends Plugin implements Runnable {
+class Plugin_UI extends Plugin {
 	private final int NULL = 0;
 	private final int DISCONNECTED = 1;
 	private final int DISCONNECTING = 2;
 	private final int BEGIN_CONNECT = 3;
 	private final int CONNECTED = 4;
 	private String hostIP = "localhost";
-    private JTextField portField = null;
 
 
-    private JTextArea chatText = null;
-    private JTextField chatLine = null;
-    private JPanel statusBar = null;
-    private JLabel statusField = null;
-    private JTextField statusColor = null;
-    private JTextField codeField = null;
-    private JRadioButton hostOption = null;
-    private JRadioButton guestOption = null;
-    private JButton connectButton = null;
-    private JButton disconnectButton = null;
 
-	private JTextField ipField = null;
-
-    private void changeStatusNTS(int newConnectStatus, boolean noError) {
-        // Change state if valid state
-        if (newConnectStatus != NULL) {
-            connectionStatus = newConnectStatus;
-        }
-
-        // If there is no error, display the appropriate status message
-        if (noError) {
-            statusString = statusMessages[connectionStatus];
-        }
-        // Otherwise, display error message
-        else {
-            statusString = statusMessages[NULL];
-        }
-
-        // Call the run() routine (Runnable interface) on the
-        // current thread
-        tcpObj.run();
-    }
 
 
     public JPanel extend_ChatUI(JPanel panel) {
@@ -64,19 +32,19 @@ class Plugin_UI extends Plugin implements Runnable {
 	    pane.add(new JLabel("Port:"));
 	    portField = new JTextField(10);
 	    portField.setEditable(true);
-	    portField.setText((new Integer(port)).toString());
+	    portField.setText((new Integer(chat.port)).toString());
 	    portField.addFocusListener(new FocusAdapter() {
 	        public void focusLost(FocusEvent e) {
 	            // should be editable only when disconnected
-	            if (connectionStatus != DISCONNECTED) {
-	                changeStatusNTS(NULL, true);
+	            if (chat.connectionStatus != DISCONNECTED) {
+	                chat.changeStatusNTS(NULL, true);
 	            } else {
 	                int temp;
 	                try {
 	                    temp = Integer.parseInt(portField.getText());
-	                    port = temp;
+	                    chat.port = temp;
 	                } catch (NumberFormatException nfe) {
-	                    portField.setText((new Integer(port)).toString());
+	                    portField.setText((new Integer(chat.port)).toString());
 	                    mainFrame.repaint();
 	                }
 	            }
@@ -90,19 +58,13 @@ class Plugin_UI extends Plugin implements Runnable {
 	    // Host/guest option
 	    buttonListener = new ActionAdapter() {
 	        public void actionPerformed(ActionEvent e) {
-	            if (connectionStatus != DISCONNECTED) {
-	                changeStatusNTS(NULL, true);
+	            if (chat.connectionStatus != DISCONNECTED) {
+	                chat.changeStatusNTS(NULL, true);
 	            } else {
-	                isHost = e.getActionCommand().equals("host");
+	                chat.isHost = e.getActionCommand().equals("host");
 
-	                // Cannot supply host IP if host option is chosen
-	                if (isHost) {
-	                    ipField.setEnabled(false);
-	                    ipField.setText("localhost");
-	                    hostIP = "localhost";
-	                } else {
-	                    ipField.setEnabled(true);
-	                }
+					hostIP = "localhost";
+
 	            }
 	        }
 	    };
@@ -130,8 +92,8 @@ class Plugin_UI extends Plugin implements Runnable {
 				// Request a connection initiation
 				if (e.getActionCommand().equals("connect")) {
 					// create log file for this client
-					String logFileName = (isHost ? "host" : "guest");
-					logFileName += port;
+					String logFileName = (chat.isHost ? "host" : "guest");
+					logFileName += chat.port;
 					logFileName += ".log";
 //                    try {
 //                        file = new FileWriter(logFileName);
@@ -140,11 +102,11 @@ class Plugin_UI extends Plugin implements Runnable {
 //                        err.getStackTrace();
 //                    }
 
-					changeStatusNTS(BEGIN_CONNECT, true);
+					chat.changeStatusNTS(BEGIN_CONNECT, true);
 				}
 				// Disconnect
 				else {
-					changeStatusNTS(DISCONNECTING, true);
+					chat.changeStatusNTS(DISCONNECTING, true);
 				}
 			}
 		};
@@ -169,7 +131,7 @@ class Plugin_UI extends Plugin implements Runnable {
 	public void initGUI() {
 		// Set up the status bar
 		statusField = new JLabel();
-		statusField.setText(statusMessages[DISCONNECTED]);
+		statusField.setText(chat.statusMessages[DISCONNECTED]);
 		statusColor = new JTextField(1);
 		statusColor.setBackground(Color.red);
 		statusColor.setEditable(false);
@@ -204,7 +166,7 @@ class Plugin_UI extends Plugin implements Runnable {
 					chatLine.selectAll();
 
 					// Send the string
-					sendString(s);
+					chat.sendString(s);
 				}
 			}
 		});
@@ -227,73 +189,5 @@ class Plugin_UI extends Plugin implements Runnable {
 		mainFrame.pack();
 		mainFrame.setVisible(true);
 	}
-
-	// Add text to send-buffer
-	public void sendString(String s) {
-		synchronized (toSend) {
-        	/*=============================================================================================
-             * 										Plugin hotspot Out-messages
-             =============================================================================================*/
-			// Wrong?? s = plugin.message_out(s);
-			// Sending
-			toSend.append(s + "\n");
-
-
-		}
-	}
-
-	public void run() {
-		switch (connectionStatus) {
-			case DISCONNECTED:
-				connectButton.setEnabled(true);
-				disconnectButton.setEnabled(false);
-				hostOption.setEnabled(true);
-				guestOption.setEnabled(true);
-				chatLine.setText("");
-				chatLine.setEnabled(false);
-				statusColor.setBackground(Color.red);
-				break;
-
-			case DISCONNECTING:
-				connectButton.setEnabled(false);
-				disconnectButton.setEnabled(false);
-				hostOption.setEnabled(false);
-				guestOption.setEnabled(false);
-				chatLine.setEnabled(false);
-				statusColor.setBackground(Color.orange);
-				break;
-
-			case CONNECTED:
-				connectButton.setEnabled(false);
-				disconnectButton.setEnabled(true);
-				hostOption.setEnabled(false);
-				guestOption.setEnabled(false);
-				chatLine.setEnabled(true);
-				statusColor.setBackground(Color.green);
-				break;
-
-			case BEGIN_CONNECT:
-				connectButton.setEnabled(false);
-				disconnectButton.setEnabled(false);
-				hostOption.setEnabled(false);
-				guestOption.setEnabled(false);
-				chatLine.setEnabled(false);
-				chatLine.grabFocus();
-				statusColor.setBackground(Color.orange);
-				break;
-		}
-
-		// Make sure that the button/text field states are consistent
-		// with the internal states
-		// TODO: portField.setText((new Integer(port)).toString());
-		hostOption.setSelected(isHost);
-		guestOption.setSelected(!isHost);
-		statusField.setText(statusString);
-//		chatText.append(toAppend.toString());
-//		toAppend.setLength(0);
-
-		mainFrame.repaint();
-	}
-
 
 }
