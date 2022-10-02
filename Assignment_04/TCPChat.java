@@ -47,7 +47,7 @@ public class TCPChat implements Runnable {
 
     public static JFrame confFrame = null;
 
-    public static Plugin plugin = new Plugin_UI();
+    public static Plugin plugin = new Plugin_CLI();
 
     // The thread-safe way to change the GUI components while
     // changing state
@@ -383,8 +383,8 @@ public class TCPChat implements Runnable {
 
             switch (connectionStatus) {
                 case BEGIN_CONNECT:
-                    try {
 
+                    try {
                         // Check pass code
 //                    	if (code != 0) {
 //                    		// Do relevant stuff: now we just don't connect
@@ -396,6 +396,7 @@ public class TCPChat implements Runnable {
                          =============================================================================================*/
                         boolean can_start = plugin.can_start();
                         if (can_start) {
+
 
                             // Try to set up a server if host
                             if (isHost) {
@@ -409,7 +410,6 @@ public class TCPChat implements Runnable {
                             // If guest, try to connect to the server
                             else {
                                 socket = new Socket(hostIP, port);
-
                             }
 
                             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

@@ -15,16 +15,13 @@ class Plugin_UI extends Plugin {
     private final int BEGIN_CONNECT = 3;
     private final int CONNECTED = 4;
 
-    public JFrame mainFrame = null;
-
+    private JFrame mainFrame = null;
     private JTextField portField = null;
-
     private JTextArea chatText = null;
     private JTextField chatLine = null;
     private JPanel statusBar = null;
     private JLabel statusField = null;
     private JTextField statusColor = null;
-    private final JTextField codeField = null;
     private JRadioButton hostOption = null;
     private JRadioButton guestOption = null;
     private JButton connectButton = null;
