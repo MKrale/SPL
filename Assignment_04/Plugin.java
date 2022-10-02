@@ -22,20 +22,9 @@ public class Plugin {
 
 	// Everything Chat and UI related
 	public void initGUI() {};
-	public JFrame mainFrame = null;
 
-	public JTextField portField = null;
+	public void checkStatus(int connectionStatus) {};
 
-	public JTextArea chatText = null;
-	public JTextField chatLine = null;
-	public JPanel statusBar = null;
-	public JLabel statusField = null;
-	public JTextField statusColor = null;
-	public JTextField codeField = null;
-	public JRadioButton hostOption = null;
-	public JRadioButton guestOption = null;
-	public JButton connectButton = null;
-	public JButton disconnectButton = null;
 
 	// Adds options to cancel start-up
 	public boolean can_start() {return true;};

@@ -494,60 +494,13 @@ public class TCPChat implements Runnable {
     // Checks the current state and sets the enables/disables
     // accordingly
     public void run() {
-        switch (connectionStatus) {
-            case DISCONNECTED:
-                plugin.connectButton.setEnabled(true);
-                plugin.disconnectButton.setEnabled(false);
-                plugin.portField.setEnabled(true);
-                plugin.hostOption.setEnabled(true);
-                plugin.guestOption.setEnabled(true);
-                plugin.chatLine.setText("");
-                plugin.chatLine.setEnabled(false);
-                plugin.statusColor.setBackground(Color.red);
-                break;
+        plugin.checkStatus(connectionStatus);
 
-            case DISCONNECTING:
-                plugin.connectButton.setEnabled(false);
-                plugin.disconnectButton.setEnabled(false);
-                plugin.portField.setEnabled(false);
-                plugin.hostOption.setEnabled(false);
-                plugin.guestOption.setEnabled(false);
-                plugin.chatLine.setEnabled(false);
-                plugin.statusColor.setBackground(Color.orange);
-                break;
-
-            case CONNECTED:
-                plugin.connectButton.setEnabled(false);
-                plugin.disconnectButton.setEnabled(true);
-                plugin.portField.setEnabled(false);
-                plugin.hostOption.setEnabled(false);
-                plugin.guestOption.setEnabled(false);
-                plugin.chatLine.setEnabled(true);
-                plugin.statusColor.setBackground(Color.green);
-                break;
-
-            case BEGIN_CONNECT:
-                plugin.connectButton.setEnabled(false);
-                plugin.disconnectButton.setEnabled(false);
-                plugin.portField.setEnabled(false);
-                plugin.hostOption.setEnabled(false);
-                plugin.guestOption.setEnabled(false);
-                plugin.chatLine.setEnabled(false);
-                plugin.chatLine.grabFocus();
-                plugin.statusColor.setBackground(Color.orange);
-                break;
-        }
 
         // Make sure that the button/text field states are consistent
         // with the internal states
-        plugin.portField.setText((Integer.valueOf(port)).toString());
-        plugin.hostOption.setSelected(isHost);
-        plugin.guestOption.setSelected(!isHost);
-        plugin.statusField.setText(statusString);
-        plugin.chatText.append(toAppend.toString());
-        toAppend.setLength(0);
 
-        plugin.mainFrame.repaint();
+
     }
 }
 

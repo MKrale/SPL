@@ -15,6 +15,21 @@ class Plugin_UI extends Plugin {
 	private final int BEGIN_CONNECT = 3;
 	private final int CONNECTED = 4;
 
+	public JFrame mainFrame = null;
+
+	private JTextField portField = null;
+
+	private JTextArea chatText = null;
+	private JTextField chatLine = null;
+	private JPanel statusBar = null;
+	private JLabel statusField = null;
+	private JTextField statusColor = null;
+	private JTextField codeField = null;
+	private JRadioButton hostOption = null;
+	private JRadioButton guestOption = null;
+	private JButton connectButton = null;
+	private JButton disconnectButton = null;
+
     public JPanel extend_ChatUI(JPanel panel) {
 		JPanel pane = null;
 	    ActionAdapter buttonListener = null;
@@ -185,4 +200,59 @@ class Plugin_UI extends Plugin {
 		mainFrame.setVisible(true);
 	}
 
+	@Override
+	public void checkStatus(int connectionStatus) {
+
+		switch (connectionStatus) {
+			case DISCONNECTED:
+				connectButton.setEnabled(true);
+				disconnectButton.setEnabled(false);
+				portField.setEnabled(true);
+				hostOption.setEnabled(true);
+				guestOption.setEnabled(true);
+				chatLine.setText("");
+				chatLine.setEnabled(false);
+				statusColor.setBackground(Color.red);
+				break;
+
+			case DISCONNECTING:
+				connectButton.setEnabled(false);
+				disconnectButton.setEnabled(false);
+				portField.setEnabled(false);
+				hostOption.setEnabled(false);
+				guestOption.setEnabled(false);
+				chatLine.setEnabled(false);
+				statusColor.setBackground(Color.orange);
+				break;
+
+			case CONNECTED:
+				connectButton.setEnabled(false);
+				disconnectButton.setEnabled(true);
+				portField.setEnabled(false);
+				hostOption.setEnabled(false);
+				guestOption.setEnabled(false);
+				chatLine.setEnabled(true);
+				statusColor.setBackground(Color.green);
+				break;
+
+			case BEGIN_CONNECT:
+				connectButton.setEnabled(false);
+				disconnectButton.setEnabled(false);
+				portField.setEnabled(false);
+				hostOption.setEnabled(false);
+				guestOption.setEnabled(false);
+				chatLine.setEnabled(false);
+				chatLine.grabFocus();
+				statusColor.setBackground(Color.orange);
+				break;
+		}
+		portField.setText((Integer.valueOf(chat.port)).toString());
+		hostOption.setSelected(chat.isHost);
+		guestOption.setSelected(!chat.isHost);
+		statusField.setText(chat.statusString);
+		chatText.append(chat.toAppend.toString());
+		chat.toAppend.setLength(0);
+		mainFrame.repaint();
+
+	}
 }
