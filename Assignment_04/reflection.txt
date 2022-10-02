@@ -1,0 +1,11 @@
+Reflection on what we did in subtask a):
+- How much effort was required to create the plug-ins?
+We first started with the creation of a framework. We created a basic TCPChat class which uses a plugin. These are used in 4 'hotspots', which are highlighted with a big comment in the code. 
+There are functions that read/alter messages going in/out (which can be used for logging, colouring & encryption), a function to alter the GUI (used by all) and one to which can add restrictions for start-up (used for authentification).
+It took a lot of effort to combine the plug-ins in the main section. We don't know how to implement this, unfortunately.
+
+
+
+- How often did you have to change the framework source-code or plug-in interfaces
+because the existing solution did not fit?
+Once we implemented the framework, it was not that hard to implement the plug-ins, however combining them in the main was a lot harder, since our previous code was very tight coupled.
