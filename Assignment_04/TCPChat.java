@@ -1,11 +1,16 @@
 import java.lang.*;
 
 import java.util.*;
+import java.util.List;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+
+import jdk.tools.jlink.resources.plugins;
+
 import java.net.*;
+import jdk.tools.jlink.plugin.Plugin;
 
 public class TCPChat implements Runnable {
 
@@ -46,8 +51,149 @@ public class TCPChat implements Runnable {
 
 
     public static JFrame confFrame = null;
-
+    
     public static Plugin plugin = new Plugin_UI();
+
+    
+    public TCPChat(List<Plugin_Child> plugins)
+    {
+    	// foreach plugin, initialize the GUI
+    	Plugin_UI pUi = new Plugin_UI();
+    	pUi.initGUI();
+  
+        /*for(Plugin_Child plugin : plugins)
+        {
+        	plugin.extend_ChatUI(confFrame);
+        }*/
+    	
+    }
+    // The main procedure
+    public static void main(String[] args) {
+        cleanUp();
+
+        String s;
+        
+        /* ---- new section by Roel ---- */
+        // Plugin is an abstract class and can therefore not create an instance of it. Need to create a child class of Plugin
+        List<Plugin_Child> plugins = new ArrayList<>();
+        plugins.add(new Plugin_colour());
+        TCPChat tcp = new TCPChat(plugins);
+        
+        /* ---- OLD SECTION ---- */
+        //plugin.initGUI(); //plugins
+
+        while (true) {
+            try { // Poll every ~10 ms
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+            }
+
+
+            switch (connectionStatus) {
+                case BEGIN_CONNECT:
+
+                    try {
+                        // Check pass code
+//                    	if (code != 0) {
+//                    		// Do relevant stuff: now we just don't connect
+//                    		cleanUp();
+//                            changeStatusTS(DISCONNECTED, false);
+//                    	}
+                    	/*=============================================================================================
+                         * 										Plugin hotspot Start Check
+                         =============================================================================================*/
+                        //boolean can_start = plugin.can_start();
+                        if (true){ //if (can_start) {
+
+
+                            // Try to set up a server if host
+                            if (isHost) {
+                                // TODO: CLI GETS STUCK HERE it seems like it can't open a socket
+                                //Setup a socket for each client
+                                hostServer = new ServerSocket(1234);
+                                socket = hostServer.accept();
+                                hostServer0 = new ServerSocket(1230); // TODO Make UI for this
+                                socket0 = hostServer0.accept();
+                            }
+
+                            // If guest, try to connect to the server
+                            else {
+                                socket = new Socket(hostIP, port);
+                            }
+
+
+                            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                            out = new PrintWriter(socket.getOutputStream(), true);
+
+                            //Host needs additional port
+                            if (isHost) {
+                                in0 = new BufferedReader(new InputStreamReader(socket0.getInputStream()));
+                                out0 = new PrintWriter(socket0.getOutputStream(), true);
+                            }
+
+                            changeStatusTS(CONNECTED, true);
+                        } else {
+                            // Print some message maybe?
+                            cleanUp();
+                            changeStatusTS(DISCONNECTED, false);
+                        }
+                    }
+
+                    // If error, clean up and output an error message
+                    catch (IOException e) {
+                        cleanUp();
+                        changeStatusTS(DISCONNECTED, false);
+                    }
+                    break;
+
+                case CONNECTED:
+                    //Send what is in the queue
+                    sendMessage(toSend, out);
+                    // Receive what's in the queue
+                    s = receiveMessage(in, isHost);
+
+                    // Hosts handles forwarding and the other queue
+                    if (isHost) {
+                        //Send the other queue
+                        sendMessage(toSend0, out0);
+                        //Forward what's in the queue
+                        if (s != null) {
+                            appendToChatBox("forwarding..." + "\n");
+                            toSend0.append(s + "\n"); //Forwards
+                        }
+                        // And receive / forward what is in the remaining queue
+                        s = receiveMessage(in0, isHost);
+                        if (s != null) {
+                            appendToChatBox("forwarding..." + "\n");
+                            toSend.append(s + "\n"); //Forwards
+                        }
+                    }
+
+                    break;
+
+                case DISCONNECTING:
+                    // Closes the file writer
+//                    try {
+//                        logFile.close();
+//                    } catch (IOException e) {}
+
+                    // Tell other chatter to disconnect as well
+                    out.print(END_CHAT_SESSION);
+                    out.flush();
+
+                    // Clean up (close all streams/sockets)
+                    cleanUp();
+                    changeStatusTS(DISCONNECTED, true);
+                    break;
+
+                default:
+                    break; // do nothing
+            }
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////
+
 
     // The thread-safe way to change the GUI components while
     // changing state
@@ -367,125 +513,6 @@ public class TCPChat implements Runnable {
         }
         return s;
     }
-
-    // The main procedure
-    public static void main(String[] args) {
-        cleanUp();
-
-        String s;
-        plugin.initGUI();
-
-        while (true) {
-            try { // Poll every ~10 ms
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-            }
-
-
-            switch (connectionStatus) {
-                case BEGIN_CONNECT:
-
-                    try {
-                        // Check pass code
-//                    	if (code != 0) {
-//                    		// Do relevant stuff: now we just don't connect
-//                    		cleanUp();
-//                            changeStatusTS(DISCONNECTED, false);
-//                    	}
-                    	/*=============================================================================================
-                         * 										Plugin hotspot Start Check
-                         =============================================================================================*/
-                        boolean can_start = plugin.can_start();
-                        if (can_start) {
-
-
-                            // Try to set up a server if host
-                            if (isHost) {
-                                // TODO: CLI GETS STUCK HERE it seems like it can't open a socket
-                                //Setup a socket for each client
-                                hostServer = new ServerSocket(1234);
-                                socket = hostServer.accept();
-                                hostServer0 = new ServerSocket(1230); // TODO Make UI for this
-                                socket0 = hostServer0.accept();
-                            }
-
-                            // If guest, try to connect to the server
-                            else {
-                                socket = new Socket(hostIP, port);
-                            }
-
-
-                            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                            out = new PrintWriter(socket.getOutputStream(), true);
-
-                            //Host needs additional port
-                            if (isHost) {
-                                in0 = new BufferedReader(new InputStreamReader(socket0.getInputStream()));
-                                out0 = new PrintWriter(socket0.getOutputStream(), true);
-                            }
-
-                            changeStatusTS(CONNECTED, true);
-                        } else {
-                            // Print some message maybe?
-                            cleanUp();
-                            changeStatusTS(DISCONNECTED, false);
-                        }
-                    }
-
-                    // If error, clean up and output an error message
-                    catch (IOException e) {
-                        cleanUp();
-                        changeStatusTS(DISCONNECTED, false);
-                    }
-                    break;
-
-                case CONNECTED:
-                    //Send what is in the queue
-                    sendMessage(toSend, out);
-                    // Receive what's in the queue
-                    s = receiveMessage(in, isHost);
-
-                    // Hosts handles forwarding and the other queue
-                    if (isHost) {
-                        //Send the other queue
-                        sendMessage(toSend0, out0);
-                        //Forward what's in the queue
-                        if (s != null) {
-                            appendToChatBox("forwarding..." + "\n");
-                            toSend0.append(s + "\n"); //Forwards
-                        }
-                        // And receive / forward what is in the remaining queue
-                        s = receiveMessage(in0, isHost);
-                        if (s != null) {
-                            appendToChatBox("forwarding..." + "\n");
-                            toSend.append(s + "\n"); //Forwards
-                        }
-                    }
-
-                    break;
-
-                case DISCONNECTING:
-                    // Closes the file writer
-//                    try {
-//                        logFile.close();
-//                    } catch (IOException e) {}
-
-                    // Tell other chatter to disconnect as well
-                    out.print(END_CHAT_SESSION);
-                    out.flush();
-
-                    // Clean up (close all streams/sockets)
-                    cleanUp();
-                    changeStatusTS(DISCONNECTED, true);
-                    break;
-
-                default:
-                    break; // do nothing
-            }
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////
 
     public void set_plugin(Plugin p) {
         plugin = p;

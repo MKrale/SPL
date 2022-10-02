@@ -2,7 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class Plugin_authentication extends Plugin {
+public class Plugin_authentication extends Plugin_Child {
 	
 	// Plugin variables
 	private int password = 0;

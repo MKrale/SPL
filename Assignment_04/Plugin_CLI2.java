@@ -6,7 +6,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 
 
-class Plugin_CLI2 extends Plugin {
+class Plugin_CLI2 extends Plugin_Child {
     private final int NULL = 0;
     private final int DISCONNECTED = 1;
     private final int DISCONNECTING = 2;

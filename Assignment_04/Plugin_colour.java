@@ -6,7 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class Plugin_colour extends Plugin {
+public class Plugin_colour extends Plugin_Child {
 	
 	private String colour = "";
 

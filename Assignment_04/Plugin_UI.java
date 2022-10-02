@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.net.*;
 
 
-class Plugin_UI extends Plugin {
+class Plugin_UI extends Plugin_Child {
     private final int NULL = 0;
     private final int DISCONNECTED = 1;
     private final int DISCONNECTING = 2;
