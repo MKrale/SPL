@@ -47,7 +47,7 @@ public class TCPChat implements Runnable {
 
     public static JFrame confFrame = null;
 
-    public static Plugin plugin = new Plugin_CLI();
+    public static Plugin plugin = new Plugin_UI();
 
     // The thread-safe way to change the GUI components while
     // changing state
@@ -370,6 +370,7 @@ public class TCPChat implements Runnable {
 
     // The main procedure
     public static void main(String[] args) {
+        cleanUp();
 
         String s;
         plugin.initGUI();
@@ -400,8 +401,9 @@ public class TCPChat implements Runnable {
 
                             // Try to set up a server if host
                             if (isHost) {
+                                // TODO: CLI GETS STUCK HERE it seems like it can't open a socket
                                 //Setup a socket for each client
-                                hostServer = new ServerSocket(port);
+                                hostServer = new ServerSocket(1234);
                                 socket = hostServer.accept();
                                 hostServer0 = new ServerSocket(1230); // TODO Make UI for this
                                 socket0 = hostServer0.accept();
@@ -411,6 +413,7 @@ public class TCPChat implements Runnable {
                             else {
                                 socket = new Socket(hostIP, port);
                             }
+
 
                             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                             out = new PrintWriter(socket.getOutputStream(), true);
