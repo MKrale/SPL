@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+	<properties>
+		<graphics key="autolayoutconstraints" value="false"/>
+		<graphics key="legendposition" value="866,34"/>
+		<graphics key="legendautolayout" value="false"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<graphics key="layoutalgorithm" value="1"/>
+	</properties>
+	<struct>
+		<and mandatory="true" name="base">
+			<alt abstract="true" mandatory="true" name="UI">
+				<feature name="CLI"/>
+				<feature name="GUI"/>
+			</alt>
+			<feature name="Logging"/>
+			<feature name="Colour"/>
+			<feature name="Authentication"/>
+			<feature name="Encryption"/>
+			<feature name="Sound"/>
+		</and>
+	</struct>
+</featureModel>

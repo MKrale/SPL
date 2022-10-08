@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<feature automatic="selected" name="base"/>
+	<feature automatic="selected" name="UI"/>
+	<feature automatic="unselected" name="CLI"/>
+	<feature manual="selected" name="GUI"/>
+	<feature name="Logging"/>
+	<feature name="Colour"/>
+	<feature name="Authentication"/>
+	<feature name="Encryption"/>
+	<feature name="Sound"/>
+</configuration>
