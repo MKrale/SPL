@@ -47,7 +47,7 @@ public class TCPChat implements Runnable {
 
     public static JFrame confFrame = null;
 
-    public static Plugin plugin = new Plugin_UI();
+    //public static Plugin plugin = new Plugin_UI();
 
     // The thread-safe way to change the GUI components while
     // changing state
