@@ -2,7 +2,7 @@
 <featureModel>
 	<properties>
 		<graphics key="autolayoutconstraints" value="false"/>
-		<graphics key="legendposition" value="866,34"/>
+		<graphics key="legendposition" value="703,5"/>
 		<graphics key="legendautolayout" value="false"/>
 		<graphics key="showshortnames" value="false"/>
 		<graphics key="layout" value="horizontal"/>
@@ -11,16 +11,22 @@
 		<graphics key="layoutalgorithm" value="1"/>
 	</properties>
 	<struct>
-		<and mandatory="true" name="base">
-			<alt abstract="true" mandatory="true" name="UI">
-				<feature name="CLI"/>
-				<feature name="GUI"/>
-			</alt>
-			<feature name="Logging"/>
-			<feature name="Colour"/>
-			<feature name="Authentication"/>
-			<feature name="Encryption"/>
-			<feature name="Sound"/>
+		<and abstract="true" mandatory="true" name="ChatApplication">
+			<graphics key="collapsed" value="false"/>
+			<and mandatory="true" name="base">
+				<graphics key="collapsed" value="false"/>
+				<alt abstract="true" mandatory="true" name="UI">
+					<feature name="CLI"/>
+					<feature name="GUI"/>
+				</alt>
+			</and>
+			<and abstract="true" name="Features">
+				<feature name="Logging"/>
+				<feature name="Colour"/>
+				<feature name="Authentication"/>
+				<feature name="Encryption"/>
+				<feature name="Sound"/>
+			</and>
 		</and>
 	</struct>
 </featureModel>

@@ -47,7 +47,8 @@ public class TCPChat implements Runnable {
 
     public static JFrame confFrame = null;
 
-    public static Plugin plugin = new Plugin_UI();
+    // Don't need this for assignment 5
+    //public static Plugin plugin = new Plugin_UI();
 
     // The thread-safe way to change the GUI components while
     // changing state
@@ -373,7 +374,8 @@ public class TCPChat implements Runnable {
         cleanUp();
 
         String s;
-        plugin.initGUI();
+        // Plugin not used anymore, just use the CLI or GUI
+        //plugin.initGUI();
 
         while (true) {
             try { // Poll every ~10 ms

@@ -1,6 +1,11 @@
-public class Main {
 
-   public static void main(String[] args){
-      TCPChat c = new TCPChat();]
+
+/**
+ * Authentication feature main 
+ * TODO description
+ */
+public class Main {
+   protected void print() {
+	   System.out.print("Authentication");
    }
 }
