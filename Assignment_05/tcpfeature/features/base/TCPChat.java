@@ -74,112 +74,112 @@ public class TCPChat implements Runnable {
 
     /////////////////////////////////////////////////////////////////
 
-//    private static JPanel initOptionsPane() {
-//        JPanel pane = null;
-//        ActionAdapter buttonListener = null;
-//
-//        // Create an options pane
-//        JPanel optionsPane = new JPanel(new GridLayout(4, 1));
-//
-//        // Host/guest option
+    private static JPanel initOptionsPane() {
+        JPanel pane = null;
+        ActionAdapter buttonListener = null;
+
+        // Create an options pane
+        JPanel optionsPane = new JPanel(new GridLayout(4, 1));
+
+        // Host/guest option
+        buttonListener = new ActionAdapter() {
+            public void actionPerformed(ActionEvent e) {
+                if (plugin.connectionStatus != DISCONNECTED) {
+                    changeStatusNTS(NULL, true);
+                } else {
+                    isHost = e.getActionCommand().equals("host");
+
+                    // Cannot supply host IP if host option is chosen
+
+                    hostIP = "localhost";
+                }
+            }
+        };
+        ButtonGroup bg = new ButtonGroup();
+        hostOption = new JRadioButton("Host", true);
+        hostOption.setMnemonic(KeyEvent.VK_H);
+        hostOption.setActionCommand("host");
+        hostOption.addActionListener(buttonListener);
+        guestOption = new JRadioButton("Guest", false);
+        guestOption.setMnemonic(KeyEvent.VK_G);
+        guestOption.setActionCommand("guest");
+        guestOption.addActionListener(buttonListener);
+        bg.add(hostOption);
+        bg.add(guestOption);
+        pane = new JPanel(new GridLayout(1, 2));
+        pane.add(hostOption);
+        pane.add(guestOption);
+        optionsPane.add(pane);
+
+
+//     // Normal/Red option
 //        buttonListener = new ActionAdapter() {
 //            public void actionPerformed(ActionEvent e) {
-//                if (plugin.connectionStatus != DISCONNECTED) {
-//                    changeStatusNTS(NULL, true);
-//                } else {
-//                    isHost = e.getActionCommand().equals("host");
-//
-//                    // Cannot supply host IP if host option is chosen
-//
-//                    hostIP = "localhost";
-//                }
+//            	isBlue = e.getActionCommand().equals("blue");
 //            }
 //        };
-//        ButtonGroup bg = new ButtonGroup();
-//        hostOption = new JRadioButton("Host", true);
-//        hostOption.setMnemonic(KeyEvent.VK_H);
-//        hostOption.setActionCommand("host");
-//        hostOption.addActionListener(buttonListener);
-//        guestOption = new JRadioButton("Guest", false);
-//        guestOption.setMnemonic(KeyEvent.VK_G);
-//        guestOption.setActionCommand("guest");
-//        guestOption.addActionListener(buttonListener);
-//        bg.add(hostOption);
-//        bg.add(guestOption);
+//        ButtonGroup bgc = new ButtonGroup();
+//        blueOption = new JRadioButton("Blue", false);
+//        blueOption.setMnemonic(KeyEvent.VK_B);
+//        blueOption.setActionCommand("blue");
+//        blueOption.addActionListener(buttonListener);
+//        redOption = new JRadioButton("Red", true);
+//        redOption.setMnemonic(KeyEvent.VK_R);
+//        redOption.setActionCommand("red");
+//        redOption.addActionListener(buttonListener);
+//        bgc.add(blueOption);
+//        bgc.add(redOption);
 //        pane = new JPanel(new GridLayout(1, 2));
-//        pane.add(hostOption);
-//        pane.add(guestOption);
+//        pane.add(blueOption);
+//        pane.add(redOption);
 //        optionsPane.add(pane);
-//
-//
-////     // Normal/Red option
-////        buttonListener = new ActionAdapter() {
-////            public void actionPerformed(ActionEvent e) {
-////            	isBlue = e.getActionCommand().equals("blue");
-////            }
-////        };
-////        ButtonGroup bgc = new ButtonGroup();
-////        blueOption = new JRadioButton("Blue", false);
-////        blueOption.setMnemonic(KeyEvent.VK_B);
-////        blueOption.setActionCommand("blue");
-////        blueOption.addActionListener(buttonListener);
-////        redOption = new JRadioButton("Red", true);
-////        redOption.setMnemonic(KeyEvent.VK_R);
-////        redOption.setActionCommand("red");
-////        redOption.addActionListener(buttonListener);
-////        bgc.add(blueOption);
-////        bgc.add(redOption);
-////        pane = new JPanel(new GridLayout(1, 2));
-////        pane.add(blueOption);
-////        pane.add(redOption);
-////        optionsPane.add(pane);
-//
-//
-//        // Connect/disconnect buttons
-//        JPanel buttonPane = new JPanel(new GridLayout(1, 2));
-//        buttonListener = new ActionAdapter() {
-//            public void actionPerformed(ActionEvent e) {
-//                // Request a connection initiation
-//                if (e.getActionCommand().equals("connect")) {
-//                    // create log file for this client
-//                    String logFileName = (isHost ? "host" : "guest");
-//                    logFileName += port;
-//                    logFileName += ".log";
-////                    try {
-////                        file = new FileWriter(logFileName);
-////                        logFile = new BufferedWriter(file);
-////                    } catch (Exception err) {
-////                        err.getStackTrace();
-////                    }
-//
-//                    changeStatusNTS(BEGIN_CONNECT, true);
-//                }
-//                // Disconnect
-//                else {
-//                    changeStatusNTS(DISCONNECTING, true);
-//                }
-//            }
-//        };
-//        connectButton = new JButton("Connect");
-//        connectButton.setMnemonic(KeyEvent.VK_C);
-//        connectButton.setActionCommand("connect");
-//        connectButton.addActionListener(buttonListener);
-//        connectButton.setEnabled(true);
-//        disconnectButton = new JButton("Disconnect");
-//        disconnectButton.setMnemonic(KeyEvent.VK_D);
-//        disconnectButton.setActionCommand("disconnect");
-//        disconnectButton.addActionListener(buttonListener);
-//        disconnectButton.setEnabled(false);
-//        buttonPane.add(connectButton);
-//        buttonPane.add(disconnectButton);
-//        optionsPane.add(buttonPane);
-//
-//        /*=============================================================================================
-//         * 										Plugin hotspot UI
-//         =============================================================================================*/
-//        optionsPane = plugin.extend_ChatUI(optionsPane);
-//        return optionsPane;
-//    }
+
+
+        // Connect/disconnect buttons
+        JPanel buttonPane = new JPanel(new GridLayout(1, 2));
+        buttonListener = new ActionAdapter() {
+            public void actionPerformed(ActionEvent e) {
+                // Request a connection initiation
+                if (e.getActionCommand().equals("connect")) {
+                    // create log file for this client
+                    String logFileName = (isHost ? "host" : "guest");
+                    logFileName += port;
+                    logFileName += ".log";
+//                    try {
+//                        file = new FileWriter(logFileName);
+//                        logFile = new BufferedWriter(file);
+//                    } catch (Exception err) {
+//                        err.getStackTrace();
+//                    }
+
+                    changeStatusNTS(BEGIN_CONNECT, true);
+                }
+                // Disconnect
+                else {
+                    changeStatusNTS(DISCONNECTING, true);
+                }
+            }
+        };
+        connectButton = new JButton("Connect");
+        connectButton.setMnemonic(KeyEvent.VK_C);
+        connectButton.setActionCommand("connect");
+        connectButton.addActionListener(buttonListener);
+        connectButton.setEnabled(true);
+        disconnectButton = new JButton("Disconnect");
+        disconnectButton.setMnemonic(KeyEvent.VK_D);
+        disconnectButton.setActionCommand("disconnect");
+        disconnectButton.addActionListener(buttonListener);
+        disconnectButton.setEnabled(false);
+        buttonPane.add(connectButton);
+        buttonPane.add(disconnectButton);
+        optionsPane.add(buttonPane);
+
+        /*=============================================================================================
+         * 										Plugin hotspot UI
+         =============================================================================================*/
+        optionsPane = plugin.extend_ChatUI(optionsPane);
+        return optionsPane;
+    }
 
     /////////////////////////////////////////////////////////////////
 
