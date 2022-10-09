@@ -14,8 +14,10 @@ public class Main {
 	}
 	
 	// Normal/Red option
+	// @Override
 	public static JPanel initOptionsPane() {
-	    JPanel pane = null;
+	    original();
+		JPanel pane = null;
 	    ActionAdapter buttonListener = null;
 	
 	    // Create an options pane
@@ -45,8 +47,6 @@ public class Main {
 	
 	}
 	
-
-   
 // Placeholder function for colouring text:
 	private static String colour(String s) {
 		if (!isBlue) {	
@@ -60,17 +60,6 @@ public class Main {
 		original();
 		synchronized (toSend) {
 			s = colour(s);
-//       	//Logging
-//       	if (Conf.Logging) {
-//               logMessages("OUTGOING", s);
-//               printOutMessage("OUTGOING", s);
-//       	}
-//       	//Encryption
-//       	if (Conf.Encryption) {
-//       		s = rot13(reverse(s));
-//       	}
-           // Wrong?? s = plugin.message_out(s);
-           // Sending
 			toSend.append(s + "\n");
 		}
 	}

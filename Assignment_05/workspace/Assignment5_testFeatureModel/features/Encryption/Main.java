@@ -1,10 +1,10 @@
 class Main {
     String last;
-
-    Main() { last = "EncryptionLast"; }
-
+ 
+    Main() { last = "last"; }
+ 
     void print() {
-    	original();
-    	System.out.println( last );
+        original();
+        System.out.println( last );
     }
 }

@@ -3,8 +3,8 @@
     String more;
 
 	
-
-    Main  () { more = "Colour";  last = "EncryptionLast"; }
+ 
+    Main  () { more = "more";  last = "last"; }
 
 	
  
@@ -14,10 +14,10 @@
     }
 
 	
-
+ 
     void print() {
-    	print__wrappee__Colour();
-    	System.out.println( last );
+        print__wrappee__Colour();
+        System.out.println( last );
     }
 
 	

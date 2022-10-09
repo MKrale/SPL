@@ -1,7 +1,7 @@
 class Main {
     String more;
  
-    Main() { more = "Colour"; }
+    Main() { more = "more"; }
  
     void print() {
         original();

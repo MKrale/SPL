@@ -9,6 +9,6 @@
 	<feature name="Logging"/>
 	<feature manual="selected" name="Colour"/>
 	<feature name="Authentication"/>
-	<feature manual="selected" name="Encryption"/>
+	<feature name="Encryption"/>
 	<feature name="Sound"/>
 </configuration>
