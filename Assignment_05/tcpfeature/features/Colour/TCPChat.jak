@@ -2,14 +2,12 @@
 import java.awt.GridLayout;
 import javax.swing.JPanel;
 
-
-
 /**
  * Colour feature main 
  * By: Roel Duijsings
  */
 
-public class Main {
+public class TCPChat {
 	protected void print() {
 		original();
 		System.out.print("Colour");

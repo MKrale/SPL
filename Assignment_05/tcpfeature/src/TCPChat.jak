@@ -1,15 +1,18 @@
-/**
+
+
+SoUrCe RooT Encryption "../features/Encryption/TCPChat.jak";/**
  * Encryption feature main 
  * By: Roel Duijsings
  * TODO description
  */
-public class Main {
+public class TCPChat {
    protected void print() {
+	   original();
 	   System.out.print("Encryption");
    }
 
    public static String rot13(String input) {
-       StringBuilder sb = new StringBuilder();
+	   StringBuilder sb = new StringBuilder();
        for (int i = 0; i < input.length(); i++) {
            char c = input.charAt(i);
            if (c >= 'a' && c <= 'm') c += 13;

@@ -1,0 +1,23 @@
+
+import javax.swing.JPanel;
+
+/**
+ * Authentication feature main 
+ * By: Roel Duijsings
+ * TODO description
+ */
+public class TCPChat {
+	public static JCheckBox authenticationBox = null;
+
+	protected void print() {
+		original();
+		System.out.print("Authentication");
+	}
+	public static JPanel initOptionsPane() {
+	    original();
+	    authenticationBox = new JCheckBox ("Enable authentication", defaultChecked);
+        authenticationBox.setMnemonic(KeyEvent.VK_G);
+        pane.add(authenticationBox);
+	}
+	
+}
