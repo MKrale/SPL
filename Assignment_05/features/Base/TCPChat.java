@@ -61,7 +61,13 @@ public class TCPChat implements Runnable {
 	
     public static JFrame confFrame = null;
 
-    public static Plugin plugin = new Plugin_authentication();
+    public static String message_in(String s) {return s;};
+	public static String message_out(String s) {return s;}
+
+	public static JPanel extend_ChatUI(JPanel panel) {return panel;};
+
+	public static void checkStatus(int connectionStatus) {};
+	public static boolean can_start() {return true;};
     		
     		
 		
@@ -297,7 +303,7 @@ public class TCPChat implements Runnable {
         /*=============================================================================================
          * 										Plugin hotspot UI
          =============================================================================================*/
-        optionsPane = plugin.extend_ChatUI(optionsPane);
+        optionsPane = extend_ChatUI(optionsPane);
         return optionsPane;
     }
 
@@ -336,7 +342,7 @@ public class TCPChat implements Runnable {
                 	/*=============================================================================================
                      * 										Plugin hotspot Out-messages
                      =============================================================================================*/
-                	s = plugin.message_out(s);     	
+                	s = message_out(s);     	
                     appendToChatBox("OUTGOING: " + s + "\n");
                     chatLine.selectAll();
 
@@ -423,27 +429,6 @@ public class TCPChat implements Runnable {
     }
 
     /////////////////////////////////////////////////////////////////
-    public static String rot13(String input) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            if (c >= 'a' && c <= 'm') c += 13;
-            else if (c >= 'A' && c <= 'M') c += 13;
-            else if (c >= 'n' && c <= 'z') c -= 13;
-            else if (c >= 'N' && c <= 'Z') c -= 13;
-            sb.append(c);
-        }
-        return sb.toString();
-    }
-
-    public static String reverse(String input) {
-        StringBuilder input1 = new StringBuilder();
-        input1.append(input);
-
-        // reverse StringBuilder input1
-        input1.reverse();
-        return input1.toString();
-    }
 
 //    private static void logMessages(String type, String s) {
 //        try {
@@ -473,7 +458,7 @@ public class TCPChat implements Runnable {
         	/*=============================================================================================
              * 										Plugin hotspot Out-messages
              =============================================================================================*/
-        	s = plugin.message_out(s);
+        	s = message_out(s);
         	// Sending
         	toSend.append(s + "\n");
 
@@ -595,7 +580,7 @@ public class TCPChat implements Runnable {
                     	/*=============================================================================================
                          * 										Plugin hotspot Start Check
                          =============================================================================================*/
-                    	boolean can_start = plugin.can_start();
+                    	boolean can_start = can_start();
                     	if(can_start) {
 
 	                        // Try to set up a server if host
@@ -758,5 +743,3 @@ class ActionAdapter implements ActionListener {
     public void actionPerformed(ActionEvent e) {
     }
 }
-
-////////////////////////////////////////////////////////////////////

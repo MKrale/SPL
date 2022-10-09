@@ -1,67 +1,285 @@
-import java.lang.*;
+import java.lang.*; 
 
-import java.util.*;
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.net.*;
+import java.util.*; 
+import java.io.*; import java.awt.*; 
+import java.awt.event.*; 
+import javax.swing.*; 
+import java.net.*; 
+import java.awt.event.FocusAdapter; 
+import java.awt.event.FocusEvent; 
 
-public class TCPChat implements Runnable {
+import javax.swing.JLabel; 
+import javax.swing.JPanel; 
+import javax.swing.JTextField; 
+
+public   class  TCPChat  implements Runnable {
+	
     
 
     public final static int NULL = 0;
+
+	
     public final static int DISCONNECTED = 1;
+
+	
     public final static int DISCONNECTING = 2;
+
+	
     public final static int BEGIN_CONNECT = 3;
+
+	
     public final static int CONNECTED = 4;
+
+	
 
     // Other constants
     public final static String statusMessages[] = {" Error! Could not connect!", " Disconnected", " Disconnecting...", " Connecting...", " Connected"};
+
+	
     public final static TCPChat tcpObj = new TCPChat();
-    public final static String END_CHAT_SESSION = new Character((char) 0).toString(); // Indicates the end of a session
+
+	
+    public final static String END_CHAT_SESSION = new Character((char) 0).toString();
+
+	 // Indicates the end of a session
 
     // Connection state info
     public static String hostIP = "localhost";
+
+	
     public static int port = 1234;
-    public static int code = 0000;
+
+	
+	public static int code  = 0;
+
+	
     public static int connectionStatus = DISCONNECTED;
+
+	
     public static String statusString = statusMessages[connectionStatus];
+
+	
     public static boolean isHost = true;
+
+	
     public static StringBuffer toAppend = new StringBuffer("");
+
+	
     public static StringBuffer toSend = new StringBuffer("");
+
+	
     public static StringBuffer toSend0 = new StringBuffer("");
+
+	
 
     // Various GUI components and info
     public static JFrame mainFrame = null;
 
+	
+
     public static JTextArea chatText = null;
+
+	
     public static JTextField chatLine = null;
+
+	
     public static JPanel statusBar = null;
+
+	
     public static JLabel statusField = null;
+
+	
     public static JTextField statusColor = null;
+
+	
     public static JTextField ipField = null;
+
+	
     public static JTextField portField = null;
+
+	
     public static JTextField codeField = null;
+
+	
     public static JRadioButton hostOption = null;
+
+	
     public static JRadioButton guestOption = null;
+
+	
     public static JButton connectButton = null;
+
+	
     public static JButton disconnectButton = null;
+
+	
 
     // TCP Components
     public static ServerSocket hostServer = null;
+
+	
     public static ServerSocket hostServer0 = null;
+
+	
     public static Socket socket = null;
+
+	
     public static Socket socket0 = null;
+
+	
     public static BufferedReader in = null;
+
+	
     public static BufferedReader in0 = null;
+
+	
     public static PrintWriter out = null;
+
+	
     public static PrintWriter out0 = null;
+
+	
 	
 	
     public static JFrame confFrame = null;
 
-    public static Plugin plugin = new Plugin_authentication();
+	
+
+     private static String  message_in__wrappee__Base  (String s) {return s;}
+
+	
+
+	
+	
+	public static String message_in(String s) {
+		s = message_in__wrappee__Base(s);
+		if (! isHost) {
+			s = reverse(rot13(s));
+		}
+		return s;
+	}
+
+	;
+
+	
+	 private static String  message_out__wrappee__Base  (String s) {return s;}
+
+	
+
+
+	 private static String  message_out__wrappee__CLI  (String s){
+		String s_ = message_out__wrappee__Base(s);
+		System.out.println(s_) ;
+		return s_;
+	}
+
+	
+	 private static String  message_out__wrappee__Colour  (String s){
+		s = message_out__wrappee__CLI(s);
+		if (!isHost){
+			s = colour(s);
+		}
+		return s;
+	}
+
+	
+	
+	public static String message_out(String s){
+		if (!isHost) {
+			s = rot13(reverse(s));
+		}
+		s = message_out__wrappee__Colour(s);
+		return s;
+	}
+
+	
+
+	 private static JPanel  extend_ChatUI__wrappee__Base  (JPanel panel) {return panel;}
+
+	
+
+	
+	 private static JPanel  extend_ChatUI__wrappee__Colour  (JPanel panel) {
+		
+	  panel = extend_ChatUI__wrappee__Base(panel);
+	  JPanel pane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+	  pane.add(new JLabel("Colour:"));
+	  JTextField codeField = new JTextField(10);
+	  codeField.setEditable(true);
+	  codeField.setText((new String(colour)).toString());
+	  codeField.addFocusListener(new FocusAdapter() {
+	      public void focusLost(FocusEvent e) {
+	          // Removed some checks here...
+	    	  String temp;
+	          try {
+	              temp = (codeField.getText());
+	              colour = temp;
+	          } catch (NumberFormatException nfe) {
+	              codeField.setText((new String(colour)).toString());
+	          }
+	
+	      }
+	  });
+	  pane.add(codeField);
+	  panel.add(pane);
+		  
+		  return  panel;
+		}
+
+	
+
+	public static JPanel extend_ChatUI(JPanel panel) {
+	// Adds Password input to GUI
+		
+	  panel = extend_ChatUI__wrappee__Colour(panel);
+	  System.out.print("Help!");
+	    
+	  JPanel pane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+	  pane.add(new JLabel("Entry code:"));
+	  JTextField codeField = new JTextField(10);
+	  codeField.setEditable(true);
+	  codeField.setText((new Integer(code)).toString());
+	  codeField.addFocusListener(new FocusAdapter() {
+	      public void focusLost(FocusEvent e) {
+	          // Removed some checks here...
+	    	  int temp;
+              try {
+                  temp = Integer.parseInt(codeField.getText());
+                  code = temp;
+              } catch (NumberFormatException nfe) {
+                  codeField.setText((new Integer(code)).toString());
+              }
+
+	      }
+	  });
+	  pane.add(codeField);
+	  panel.add(pane);
+	  return  panel;
+	}
+
+	;
+
+	
+
+	public static void checkStatus(int connectionStatus) {}
+
+	;
+
+	
+	 private static boolean  can_start__wrappee__Base  () {return true;}
+
+	
+  
+	public static boolean can_start() {
+		// Adds start-up condition that code = password
+		boolean canStart = can_start__wrappee__Base();
+		
+		return canStart && (code == password);
+	}
+
+	;
+
+	
     		
     		
 		
@@ -297,9 +515,11 @@ public class TCPChat implements Runnable {
         /*=============================================================================================
          * 										Plugin hotspot UI
          =============================================================================================*/
-        optionsPane = plugin.extend_ChatUI(optionsPane);
+        optionsPane = extend_ChatUI(optionsPane);
         return optionsPane;
     }
+
+	
 
     /////////////////////////////////////////////////////////////////
 
@@ -336,7 +556,7 @@ public class TCPChat implements Runnable {
                 	/*=============================================================================================
                      * 										Plugin hotspot Out-messages
                      =============================================================================================*/
-                	s = plugin.message_out(s);     	
+                	s = message_out(s);     	
                     appendToChatBox("OUTGOING: " + s + "\n");
                     chatLine.selectAll();
 
@@ -365,6 +585,8 @@ public class TCPChat implements Runnable {
         mainFrame.setVisible(true);
     }
 
+	
+
     /////////////////////////////////////////////////////////////////
 
     // The thread-safe way to change the GUI components while
@@ -388,6 +610,8 @@ public class TCPChat implements Runnable {
         // error-handling and GUI-update thread
         SwingUtilities.invokeLater(tcpObj);
     }
+
+	
 
     /////////////////////////////////////////////////////////////////
 
@@ -413,6 +637,8 @@ public class TCPChat implements Runnable {
         tcpObj.run();
     }
 
+	
+
     /////////////////////////////////////////////////////////////////
 
     // Thread-safe way to append to the chat box
@@ -422,28 +648,9 @@ public class TCPChat implements Runnable {
         }
     }
 
+	
+
     /////////////////////////////////////////////////////////////////
-    public static String rot13(String input) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            if (c >= 'a' && c <= 'm') c += 13;
-            else if (c >= 'A' && c <= 'M') c += 13;
-            else if (c >= 'n' && c <= 'z') c -= 13;
-            else if (c >= 'N' && c <= 'Z') c -= 13;
-            sb.append(c);
-        }
-        return sb.toString();
-    }
-
-    public static String reverse(String input) {
-        StringBuilder input1 = new StringBuilder();
-        input1.append(input);
-
-        // reverse StringBuilder input1
-        input1.reverse();
-        return input1.toString();
-    }
 
 //    private static void logMessages(String type, String s) {
 //        try {
@@ -473,13 +680,15 @@ public class TCPChat implements Runnable {
         	/*=============================================================================================
              * 										Plugin hotspot Out-messages
              =============================================================================================*/
-        	s = plugin.message_out(s);
+        	s = message_out(s);
         	// Sending
         	toSend.append(s + "\n");
 
 
         }
     }
+
+	
 
 //    // Placeholder function for colouring text:
 //    private static String colour(String s) {
@@ -526,6 +735,8 @@ public class TCPChat implements Runnable {
         }
     }
 
+	
+
     static void sendMessage(StringBuffer toSend, PrintWriter out) {
         if (toSend.length() != 0) {
             out.print(toSend);
@@ -534,6 +745,8 @@ public class TCPChat implements Runnable {
             changeStatusTS(NULL, true);
         }
       }
+
+	
     static String receiveMessage(BufferedReader in, boolean isHost) {
 		String s = null;
     	try {
@@ -567,6 +780,8 @@ public class TCPChat implements Runnable {
         return s;
     }
 
+	
+
     /////////////////////////////////////////////////////////////////
 
     // The main procedure
@@ -595,7 +810,7 @@ public class TCPChat implements Runnable {
                     	/*=============================================================================================
                          * 										Plugin hotspot Start Check
                          =============================================================================================*/
-                    	boolean can_start = plugin.can_start();
+                    	boolean can_start = can_start();
                     	if(can_start) {
 
 	                        // Try to set up a server if host
@@ -684,6 +899,8 @@ public class TCPChat implements Runnable {
         }
     }
 
+	
+
     /////////////////////////////////////////////////////////////////
 
     // Checks the current state and sets the enables/disables
@@ -749,14 +966,64 @@ public class TCPChat implements Runnable {
 
         mainFrame.repaint();
     }
-}
+
+	
+	
+	private static String colour = "";
+
+	
+	
+	private static String colour(String s) {
+		return (s+"*" + colour + "*");
+    }
+
+	
+	
+	public static String rot13(String input) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c >= 'a' && c <= 'm') c += 13;
+            else if (c >= 'A' && c <= 'M') c += 13;
+            else if (c >= 'n' && c <= 'z') c -= 13;
+            else if (c >= 'N' && c <= 'Z') c -= 13;
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
+	
+	
+	public static String reverse(String input) { 
+		
+        StringBuilder input1 = new StringBuilder();
+        input1.append(input);
+
+        // reverse StringBuilder input1
+        input1.reverse();
+        return input1.toString();
+    }
+
+	
+	
+	// Plugin variables
+	private static int password = 0;
+
+
+} 
 
 ////////////////////////////////////////////////////////////////////
 
 // Action adapter for easy event-listener coding
-class ActionAdapter implements ActionListener {
-    public void actionPerformed(ActionEvent e) {
-    }
-}
+ 
 
 ////////////////////////////////////////////////////////////////////
+
+// Action adapter for easy event-listener coding
+class  ActionAdapter  implements ActionListener {
+	
+    public void actionPerformed(ActionEvent e) {
+    }
+
+
+}

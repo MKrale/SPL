@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+	<properties>
+		<graphics key="autolayoutconstraints" value="false"/>
+		<graphics key="legendposition" value="947,39"/>
+		<graphics key="legendautolayout" value="false"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<graphics key="layoutalgorithm" value="1"/>
+	</properties>
+	<struct>
+		<and abstract="true" mandatory="true" name="Assignment5_testFeatureModel">
+			<and mandatory="true" name="Base">
+				<feature name="CLI"/>
+				<feature name="Colour"/>
+				<feature name="Encryption"/>
+				<feature name="Logging"/>
+				<feature name="Authentication"/>
+			</and>
+		</and>
+	</struct>
+</featureModel>

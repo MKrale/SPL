@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>TCPChat</name>
+	<name>Assignment_5</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -14,7 +14,7 @@
 				</dictionary>
 				<dictionary>
 					<key>composer</key>
-					<value>de.ovgu.featureide.preprocessor.munge</value>
+					<value>de.ovgu.featureide.composer.featurehouse</value>
 				</dictionary>
 				<dictionary>
 					<key>equations</key>
@@ -38,7 +38,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1665346551276</id>
+			<id>1665343898048</id>
 			<name></name>
 			<type>30</type>
 			<matcher>
