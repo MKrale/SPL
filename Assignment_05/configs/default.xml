@@ -5,6 +5,7 @@
 	<feature manual="selected" name="CLI"/>
 	<feature manual="selected" name="Colour"/>
 	<feature manual="selected" name="Encryption"/>
-	<feature name="Logging"/>
+	<feature manual="selected" name="Logging"/>
 	<feature manual="selected" name="Authentication"/>
+	<feature manual="selected" name="Beeping"/>
 </configuration>

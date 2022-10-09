@@ -13,11 +13,13 @@
 	<struct>
 		<and abstract="true" mandatory="true" name="Assignment5_testFeatureModel">
 			<and mandatory="true" name="Base">
+				<graphics key="collapsed" value="false"/>
 				<feature name="CLI"/>
 				<feature name="Colour"/>
 				<feature name="Encryption"/>
 				<feature name="Logging"/>
 				<feature name="Authentication"/>
+				<feature name="Beeping"/>
 			</and>
 		</and>
 	</struct>

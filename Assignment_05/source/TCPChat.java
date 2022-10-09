@@ -11,6 +11,7 @@ import java.awt.event.FocusEvent;
 import javax.swing.JLabel; 
 import javax.swing.JPanel; 
 import javax.swing.JTextField; 
+import java.io.FileWriter; 
 
 public   class  TCPChat  implements Runnable {
 	
@@ -42,7 +43,9 @@ public   class  TCPChat  implements Runnable {
     public final static String END_CHAT_SESSION = new Character((char) 0).toString();
 
 	 // Indicates the end of a session
+    public final static String test = "fak";
 
+	
     // Connection state info
     public static String hostIP = "localhost";
 
@@ -72,6 +75,8 @@ public   class  TCPChat  implements Runnable {
 
 	
 
+
+    
     // Various GUI components and info
     public static JFrame mainFrame = null;
 
@@ -151,12 +156,28 @@ public   class  TCPChat  implements Runnable {
 
 	
 	
-	public static String message_in(String s) {
+	 private static String  message_in__wrappee__Encryption  (String s) {
 		s = message_in__wrappee__Base(s);
 		if (! isHost) {
 			s = reverse(rot13(s));
 		}
 		return s;
+	}
+
+	
+	
+	 private static String  message_in__wrappee__Logging  (String s) {
+		s = message_in__wrappee__Encryption(s);
+		logMessages("INCOMING", s);
+		return s;
+	}
+
+	
+	
+	public static String message_in(String s){
+		String s_ = message_in__wrappee__Logging(s);
+		Toolkit.getDefaultToolkit().beep();
+		return s_;
 	}
 
 	;
@@ -184,12 +205,30 @@ public   class  TCPChat  implements Runnable {
 
 	
 	
-	public static String message_out(String s){
+	 private static String  message_out__wrappee__Encryption  (String s){
 		if (!isHost) {
 			s = rot13(reverse(s));
 		}
 		s = message_out__wrappee__Colour(s);
 		return s;
+	}
+
+	
+	
+
+	 private static String  message_out__wrappee__Logging  (String s) {
+		s = message_out__wrappee__Encryption(s);
+		logMessages("OUTGOING", s);
+		return s;
+	}
+
+	
+
+
+	public static String message_out(String s){
+		String s_ = message_out__wrappee__Logging(s);
+		Toolkit.getDefaultToolkit().beep();
+		return s_;
 	}
 
 	
@@ -280,8 +319,11 @@ public   class  TCPChat  implements Runnable {
 	;
 
 	
-    		
-    		
+    
+	public static FileWriter fr = null;
+
+	
+
 		
 
     // CONFIGURATION PANE -> Unused
@@ -480,16 +522,18 @@ public   class  TCPChat  implements Runnable {
                 // Request a connection initiation
                 if (e.getActionCommand().equals("connect")) {
                     // create log file for this client
-                    String logFileName = (isHost ? "host" : "guest");
+                	String logFileName = (isHost ? "host" : "guest");
                     logFileName += port;
                     logFileName += ".log";
-//                    try {
-//                        file = new FileWriter(logFileName);
-//                        logFile = new BufferedWriter(file);
-//                    } catch (Exception err) {
-//                        err.getStackTrace();
-//                    }
-
+                	
+                	File file = new File(logFileName);
+            		try {
+            			// Below constructor argument decides whether to append or override
+            			fr = new FileWriter(file, true);
+            		} catch (IOException err) {
+            			err.printStackTrace();
+            		}
+                	
                     changeStatusNTS(BEGIN_CONNECT, true);
                 }
                 // Disconnect
@@ -556,7 +600,7 @@ public   class  TCPChat  implements Runnable {
                 	/*=============================================================================================
                      * 										Plugin hotspot Out-messages
                      =============================================================================================*/
-                	s = message_out(s);     	
+                	s = message_out(s);
                     appendToChatBox("OUTGOING: " + s + "\n");
                     chatLine.selectAll();
 
@@ -702,6 +746,7 @@ public   class  TCPChat  implements Runnable {
 
     // Cleanup for disconnect
     private static void cleanUp() {
+    	
         try {
             if (hostServer != null) {
                 hostServer.close();
@@ -768,6 +813,7 @@ public   class  TCPChat  implements Runnable {
 //                            printOutMessage("INCOMING", s);
 //
 //                    	}
+                    	s = message_in(s);
                         appendToChatBox("INCOMING: " + s + "\n");
                         changeStatusTS(NULL, true);
                     }
@@ -879,11 +925,17 @@ public   class  TCPChat  implements Runnable {
                     break;
 
                 case DISCONNECTING:
-                    // Closes the file writer
-//                    try {
-//                        logFile.close();
-//                    } catch (IOException e) {}
-
+                	try {
+        				fr.close();
+        			} catch (IOException err) {
+        				err.printStackTrace();
+        			}
+//                	try {
+//                		logFile.close();
+//                		file.close();
+//            		} catch (IOException err) {
+//            			err.printStackTrace();
+//            		}
                     // Tell other chatter to disconnect as well
                     out.print(END_CHAT_SESSION);
                     out.flush();
@@ -1003,6 +1055,17 @@ public   class  TCPChat  implements Runnable {
         input1.reverse();
         return input1.toString();
     }
+
+	
+	
+	private static void logMessages(String type, String s) {
+		try {
+			fr.write(type + ": " + s + "\n");
+		}
+		catch (Exception e) {
+			e.getStackTrace();
+		}
+  	}
 
 	
 	

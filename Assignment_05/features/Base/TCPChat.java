@@ -20,7 +20,7 @@ public class TCPChat implements Runnable {
     public final static String statusMessages[] = {" Error! Could not connect!", " Disconnected", " Disconnecting...", " Connecting...", " Connected"};
     public final static TCPChat tcpObj = new TCPChat();
     public final static String END_CHAT_SESSION = new Character((char) 0).toString(); // Indicates the end of a session
-
+    public final static String test = "fak";
     // Connection state info
     public static String hostIP = "localhost";
     public static int port = 1234;
@@ -32,6 +32,8 @@ public class TCPChat implements Runnable {
     public static StringBuffer toSend = new StringBuffer("");
     public static StringBuffer toSend0 = new StringBuffer("");
 
+
+    
     // Various GUI components and info
     public static JFrame mainFrame = null;
 
@@ -68,8 +70,9 @@ public class TCPChat implements Runnable {
 
 	public static void checkStatus(int connectionStatus) {};
 	public static boolean can_start() {return true;};
-    		
-    		
+    
+	public static FileWriter fr = null;
+
 		
 
     // CONFIGURATION PANE -> Unused
@@ -268,16 +271,18 @@ public class TCPChat implements Runnable {
                 // Request a connection initiation
                 if (e.getActionCommand().equals("connect")) {
                     // create log file for this client
-                    String logFileName = (isHost ? "host" : "guest");
+                	String logFileName = (isHost ? "host" : "guest");
                     logFileName += port;
                     logFileName += ".log";
-//                    try {
-//                        file = new FileWriter(logFileName);
-//                        logFile = new BufferedWriter(file);
-//                    } catch (Exception err) {
-//                        err.getStackTrace();
-//                    }
-
+                	
+                	File file = new File(logFileName);
+            		try {
+            			// Below constructor argument decides whether to append or override
+            			fr = new FileWriter(file, true);
+            		} catch (IOException err) {
+            			err.printStackTrace();
+            		}
+                	
                     changeStatusNTS(BEGIN_CONNECT, true);
                 }
                 // Disconnect
@@ -342,7 +347,7 @@ public class TCPChat implements Runnable {
                 	/*=============================================================================================
                      * 										Plugin hotspot Out-messages
                      =============================================================================================*/
-                	s = message_out(s);     	
+                	s = message_out(s);
                     appendToChatBox("OUTGOING: " + s + "\n");
                     chatLine.selectAll();
 
@@ -478,6 +483,7 @@ public class TCPChat implements Runnable {
 
     // Cleanup for disconnect
     private static void cleanUp() {
+    	
         try {
             if (hostServer != null) {
                 hostServer.close();
@@ -540,6 +546,7 @@ public class TCPChat implements Runnable {
 //                            printOutMessage("INCOMING", s);
 //
 //                    	}
+                    	s = message_in(s);
                         appendToChatBox("INCOMING: " + s + "\n");
                         changeStatusTS(NULL, true);
                     }
@@ -649,11 +656,17 @@ public class TCPChat implements Runnable {
                     break;
 
                 case DISCONNECTING:
-                    // Closes the file writer
-//                    try {
-//                        logFile.close();
-//                    } catch (IOException e) {}
-
+                	try {
+        				fr.close();
+        			} catch (IOException err) {
+        				err.printStackTrace();
+        			}
+//                	try {
+//                		logFile.close();
+//                		file.close();
+//            		} catch (IOException err) {
+//            			err.printStackTrace();
+//            		}
                     // Tell other chatter to disconnect as well
                     out.print(END_CHAT_SESSION);
                     out.flush();
