@@ -1,0 +1,10 @@
+class Main {
+    static String last;
+
+    Main() { last = "EncryptionLast"; }
+
+    static void main( String[] args ) {
+       original( args );
+       System.out.println( last );
+    }
+}

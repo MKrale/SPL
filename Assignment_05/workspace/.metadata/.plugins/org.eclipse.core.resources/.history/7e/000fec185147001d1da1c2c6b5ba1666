@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<feature automatic="selected" name="Assignment5_testFeatureModel"/>
+	<feature automatic="selected" name="Base"/>
+	<feature name="UI"/>
+	<feature name="CLI"/>
+	<feature name="GUI"/>
+	<feature automatic="selected" name="Features"/>
+	<feature name="Colour"/>
+	<feature manual="selected" name="Encryption"/>
+</configuration>

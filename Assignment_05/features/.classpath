@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="Authentication"/>
+	<classpathentry kind="src" path="Base"/>
+	<classpathentry kind="src" path="Beeping"/>
+	<classpathentry kind="src" path="CLI"/>
+	<classpathentry kind="src" path="Colour"/>
+	<classpathentry kind="src" path="Encryption"/>
+	<classpathentry kind="src" path="Logging"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,3 @@
+INDEX VERSION 1.131+C:\Users\roell\Documents\Master AI\Software Product Lines\Github\SPL\workspace\.metadata\.plugins\org.eclipse.jdt.core
+2337261459.index
+2983107345.index

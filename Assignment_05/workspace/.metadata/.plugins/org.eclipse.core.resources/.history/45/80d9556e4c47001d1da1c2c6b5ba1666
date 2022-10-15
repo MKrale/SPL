@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<feature automatic="selected" name="ChatApplication"/>
+	<feature automatic="selected" name="base"/>
+	<feature automatic="selected" name="UI"/>
+	<feature automatic="unselected" name="CLI"/>
+	<feature manual="selected" name="GUI"/>
+	<feature automatic="selected" manual="selected" name="Features"/>
+	<feature name="Logging"/>
+	<feature manual="selected" name="Colour"/>
+	<feature manual="selected" name="Authentication"/>
+	<feature name="Encryption"/>
+	<feature name="Sound"/>
+</configuration>
