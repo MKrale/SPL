@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<feature automatic="selected" name="Assignment_06"/>
+	<feature automatic="selected" manual="selected" name="Base"/>
+	<feature automatic="selected" name="Features"/>
+	<feature manual="selected" name="Colour"/>
+	<feature name="Encryption"/>
+	<feature name="Beeping"/>
+</configuration>
