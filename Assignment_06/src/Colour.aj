@@ -1,30 +1,40 @@
+import java.io.*;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import java.awt.event.*;
+import javax.swing.*;
+import java.net.*;
 
 public aspect Colour {
 
 	protected String colour = "";
 
-	before(): execution(void sendString(String)){
-		if (true){//!isHost){
+	pointcut colourString(String s):
+		execution(void sendString(String))
+		&& args(s);
+	
+	after(String s): colourString(s){
+		if (true){//!isHost){            !!! add ishost!
 			s = colour(s);
 		}
 		System.out.println("Test colour");
 	}
 	
-	private String colour(String s) {
-		return (s+"*" + colour + "*");
+//	private String colour(String s) {
+//		return (s+"*" + TCPChat.colour + "*");
+//    }
+	private static String colour(String s) {
+    	if (!isBlue) {
+    		return s+"*RED*";
+    	}
+    	return s+"*BLUE*";
     }
 
-	pointcut extendUI() : execution(JPanel extend_ChatUI(JPanel));
+	pointcut extendUI(JPanel panel): 
+		execution(JPanel TCPChat.extend_ChatUI(JPanel)) 
+		&& args(panel);
 	
-	after(JPanel panel): extendUI() && args(panel){
-		  JPanel pane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+	before(JPanel panel): extendUI(panel){
+		  JPanel pane = new JPanel();
 		  pane.add(new JLabel("Colour:"));
 		  JTextField codeField = new JTextField(10);
 		  codeField.setEditable(true);

@@ -1,10 +1,12 @@
 import javax.swing.JPanel;
 
 public aspect Base {
-	after(): execution(void sendString(String )){
+	after(String string): execution(void sendString(String )) && args(string){
 		System.out.println("Test Base");
+		System.out.println(string);
 	}
-	before(TCPChat chat, JPanel p) : call(JPanel extend_ChatUI(JPanel)) && this(chat) && target(p){
+	
+	before(TCPChat chat, JPanel p) : (execution(JPanel TCPChat.extend_ChatUI(JPanel)) && this(chat) && target(p)){
 		System.out.println("Test JPanel");
 		System.out.println(thisJoinPoint);
 		System.out.println(thisJoinPoint.getSignature());
